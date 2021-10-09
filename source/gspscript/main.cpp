@@ -99,14 +99,14 @@ int getMaxIdLastRecord(GSPTable dbtable, const QString& pfnIdFieldName)
 	return nID;
 }
 
-static int nMaxQtyDictQtyID = -1;
-static int nMaxInternalQtyDictInternalQtyID = -1;
-static int nMaxInternalQtyCalcRuleID = -1;
+int nMaxQtyDictQtyID = -1;
+int nMaxInternalQtyDictInternalQtyID = -1;
+int nMaxInternalQtyCalcRuleID = -1;
 
-static const QString strGCLPCWallHCaulkLengthDeductByFact = "GCLPCWallHCaulkLengthDeductByFact";
-static const QString strGCLPCWallVCaulkLengthDeductByFact = "GCLPCWallVCaulkLengthDeductByFact";
+const QString strGCLPCWallHCaulkLengthDeductByFact = "GCLPCWallHCaulkLengthDeductByFact";
+const QString strGCLPCWallVCaulkLengthDeductByFact = "GCLPCWallVCaulkLengthDeductByFact";
 
-static const QString strMatchExpr = "(Type = 2) or (Type = 3)";
+const QString strMatchExpr = "(Type = 2) or (Type = 3)";
 
 void addBusiness(GSPDatabase m_pDb)
 {
@@ -291,43 +291,43 @@ void addBusiness(GSPDatabase m_pDb)
 	{
 		GSPRecord dbrecord;
 		dbrecord = dbtable.newRecord();
-		dbrecord.setAsInteger(pfnInternalQtyID, nMaxQtyDictQtyID + 1);
+		dbrecord.setAsInteger(pfnInternalQtyID, nMaxInternalQtyDictInternalQtyID + 1);
 		dbrecord.setAsWideString(pfnDescription, QStringLiteral("0 原始长度"));
 		dbrecord.setAsWideString(pfnStrategyName, "GCLPCWallHCaulkOriginalLength");
 		dbtable.append(dbrecord);
 
 		dbrecord = dbtable.newRecord();
-		dbrecord.setAsInteger(pfnInternalQtyID, nMaxQtyDictQtyID + 2);
+		dbrecord.setAsInteger(pfnInternalQtyID, nMaxInternalQtyDictInternalQtyID + 2);
 		dbrecord.setAsWideString(pfnDescription, QStringLiteral("1 扣门长度"));
 		dbrecord.setAsWideString(pfnStrategyName, strGCLPCWallHCaulkLengthDeductByFact);
 		dbtable.append(dbrecord);
 
 		dbrecord = dbtable.newRecord();
-		dbrecord.setAsInteger(pfnInternalQtyID, nMaxQtyDictQtyID + 3);
+		dbrecord.setAsInteger(pfnInternalQtyID, nMaxInternalQtyDictInternalQtyID + 3);
 		dbrecord.setAsWideString(pfnDescription, QStringLiteral("1 扣窗长度"));
 		dbrecord.setAsWideString(pfnStrategyName, strGCLPCWallHCaulkLengthDeductByFact);
 		dbtable.append(dbrecord);
 
 		dbrecord = dbtable.newRecord();
-		dbrecord.setAsInteger(pfnInternalQtyID, nMaxQtyDictQtyID + 4);
+		dbrecord.setAsInteger(pfnInternalQtyID, nMaxInternalQtyDictInternalQtyID + 4);
 		dbrecord.setAsWideString(pfnDescription, QStringLiteral("1 扣门联窗长度"));
 		dbrecord.setAsWideString(pfnStrategyName, strGCLPCWallHCaulkLengthDeductByFact);
 		dbtable.append(dbrecord);
 
 		dbrecord = dbtable.newRecord();
-		dbrecord.setAsInteger(pfnInternalQtyID, nMaxQtyDictQtyID + 5);
+		dbrecord.setAsInteger(pfnInternalQtyID, nMaxInternalQtyDictInternalQtyID + 5);
 		dbrecord.setAsWideString(pfnDescription, QStringLiteral("1 扣洞长度"));
 		dbrecord.setAsWideString(pfnStrategyName, strGCLPCWallHCaulkLengthDeductByFact);
 		dbtable.append(dbrecord);
 
 		dbrecord = dbtable.newRecord();
-		dbrecord.setAsInteger(pfnInternalQtyID, nMaxQtyDictQtyID + 6);
+		dbrecord.setAsInteger(pfnInternalQtyID, nMaxInternalQtyDictInternalQtyID + 6);
 		dbrecord.setAsWideString(pfnDescription, QStringLiteral("1 扣带形窗长度"));
 		dbrecord.setAsWideString(pfnStrategyName, strGCLPCWallHCaulkLengthDeductByFact);
 		dbtable.append(dbrecord);
 
 		dbrecord = dbtable.newRecord();
-		dbrecord.setAsInteger(pfnInternalQtyID, nMaxQtyDictQtyID + 7);
+		dbrecord.setAsInteger(pfnInternalQtyID, nMaxInternalQtyDictInternalQtyID + 7);
 		dbrecord.setAsWideString(pfnDescription, QStringLiteral("1 扣带形洞长度"));
 		dbrecord.setAsWideString(pfnStrategyName, strGCLPCWallHCaulkLengthDeductByFact);
 		dbtable.append(dbrecord);
@@ -335,43 +335,43 @@ void addBusiness(GSPDatabase m_pDb)
 	{
 		GSPRecord dbrecord;
 		dbrecord = dbtable.newRecord();
-		dbrecord.setAsInteger(pfnInternalQtyID, nMaxQtyDictQtyID + 8);
+		dbrecord.setAsInteger(pfnInternalQtyID, nMaxInternalQtyDictInternalQtyID + 8);
 		dbrecord.setAsWideString(pfnDescription, QStringLiteral("0 原始长度"));
 		dbrecord.setAsWideString(pfnStrategyName, "GCLPCWallVCaulkOriginalLength");
 		dbtable.append(dbrecord);
 
 		dbrecord = dbtable.newRecord();
-		dbrecord.setAsInteger(pfnInternalQtyID, nMaxQtyDictQtyID + 2);
+		dbrecord.setAsInteger(pfnInternalQtyID, nMaxInternalQtyDictInternalQtyID + 9);
 		dbrecord.setAsWideString(pfnDescription, QStringLiteral("1 扣门长度"));
 		dbrecord.setAsWideString(pfnStrategyName, strGCLPCWallVCaulkLengthDeductByFact);
 		dbtable.append(dbrecord);
 
 		dbrecord = dbtable.newRecord();
-		dbrecord.setAsInteger(pfnInternalQtyID, nMaxQtyDictQtyID + 3);
+		dbrecord.setAsInteger(pfnInternalQtyID, nMaxInternalQtyDictInternalQtyID + 10);
 		dbrecord.setAsWideString(pfnDescription, QStringLiteral("1 扣窗长度"));
 		dbrecord.setAsWideString(pfnStrategyName, strGCLPCWallVCaulkLengthDeductByFact);
 		dbtable.append(dbrecord);
 
 		dbrecord = dbtable.newRecord();
-		dbrecord.setAsInteger(pfnInternalQtyID, nMaxQtyDictQtyID + 4);
+		dbrecord.setAsInteger(pfnInternalQtyID, nMaxInternalQtyDictInternalQtyID + 11);
 		dbrecord.setAsWideString(pfnDescription, QStringLiteral("1 扣门联窗长度"));
 		dbrecord.setAsWideString(pfnStrategyName, strGCLPCWallVCaulkLengthDeductByFact);
 		dbtable.append(dbrecord);
 
 		dbrecord = dbtable.newRecord();
-		dbrecord.setAsInteger(pfnInternalQtyID, nMaxQtyDictQtyID + 5);
+		dbrecord.setAsInteger(pfnInternalQtyID, nMaxInternalQtyDictInternalQtyID + 12);
 		dbrecord.setAsWideString(pfnDescription, QStringLiteral("1 扣洞长度"));
 		dbrecord.setAsWideString(pfnStrategyName, strGCLPCWallVCaulkLengthDeductByFact);
 		dbtable.append(dbrecord);
 
 		dbrecord = dbtable.newRecord();
-		dbrecord.setAsInteger(pfnInternalQtyID, nMaxQtyDictQtyID + 6);
+		dbrecord.setAsInteger(pfnInternalQtyID, nMaxInternalQtyDictInternalQtyID + 13);
 		dbrecord.setAsWideString(pfnDescription, QStringLiteral("1 扣带形窗长度"));
 		dbrecord.setAsWideString(pfnStrategyName, strGCLPCWallVCaulkLengthDeductByFact);
 		dbtable.append(dbrecord);
 
 		dbrecord = dbtable.newRecord();
-		dbrecord.setAsInteger(pfnInternalQtyID, nMaxQtyDictQtyID + 7);
+		dbrecord.setAsInteger(pfnInternalQtyID, nMaxInternalQtyDictInternalQtyID + 14);
 		dbrecord.setAsWideString(pfnDescription, QStringLiteral("1 扣带形洞长度"));
 		dbrecord.setAsWideString(pfnStrategyName, strGCLPCWallVCaulkLengthDeductByFact);
 		dbtable.append(dbrecord);
@@ -565,7 +565,7 @@ void addCalcRule(GSPDatabase m_pDb)
 	}
 }
 
-void addCaulkGSP(const QString& dbpath)
+void addGSPBusiness(const QString& dbpath)
 {
 	GSPModel ipGSPModel = gspEngine().createModel();
 	GSPModelPersistent(ipGSPModel).loadFromFile(dbpath);
@@ -578,7 +578,20 @@ void addCaulkGSP(const QString& dbpath)
 	GSPDatabase m_pDb;
 	m_pDb = ipGSPModel.find(pdnBusiness);
 	addBusiness(m_pDb);
+}
 
+// 因为InternalQtyCalcRule表的计算规则选项ID依赖于Business表，因此需要先保存Business表
+void addGSPCalcRule(const QString& dbpath)
+{
+	GSPModel ipGSPModel = gspEngine().createModel();
+	GSPModelPersistent(ipGSPModel).loadFromFile(dbpath);
+	ipGSPModel.setMode(gmRuntime);
+	SCOPE_EXIT
+	{
+		GSPModelPersistent(ipGSPModel).saveToFile(dbpath);
+	};
+
+	GSPDatabase m_pDb;
 	m_pDb = ipGSPModel.find(pdnBQCalcRule);
 	addCalcRule(m_pDb);
 
@@ -628,7 +641,8 @@ int main(int argc, char *argv[])
 	//modifySingleGSP(true);
 
 	const QString dbpath = "C:\\Users\\quanjl\\Desktop\\RegionRule_Calc.GSP";
-	addCaulkGSP(dbpath);
+	addGSPBusiness(dbpath);
+	addGSPCalcRule(dbpath);
 	addCalcSettingField(dbpath);
 
 	qDebug() << QStringLiteral("用时 %1 s").arg(oTime.elapsed() / 1000);
