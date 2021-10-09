@@ -1,5 +1,5 @@
 ##设置库名称
-set(LIBRARY_TARGET_NAME gspscript)
+set(LIBRARY_TARGET_NAME dbscript)
 
 ##查找所有头文件
 file(GLOB_RECURSE  ${LIBRARY_TARGET_NAME}_HEADER_FILES
@@ -60,13 +60,9 @@ target_include_directories(
 find_package(Qt5 COMPONENTS Core REQUIRED)
 find_package(GBIM COMPONENTS Common REQUIRED)
 find_package(GDB COMPONENTS GGDB REQUIRED)
-find_package(GLDRS COMPONENTS GSP VMProtect GSPKeyLib REQUIRED)
-find_package(GMP COMPONENTS GMCommon REQUIRED)
 
 target_link_libraries(${LIBRARY_TARGET_NAME}
     PRIVATE Qt5::Core
 	PRIVATE GBIM::Common
 	PRIVATE GDB::GGDB
-	PRIVATE GLDRS::GSP GLDRS::VMProtect GLDRS::GSPKeyLib
-	PRIVATE GMP::GMCommon
 )

@@ -68,7 +68,7 @@ find_package(Qt5Core REQUIRED )
 #find_package(Qt5Widgets REQUIRED )
 
 #add_subdirectory(AES)
-add_subdirectory(gspscript)
+add_subdirectory(dbscript)
 
 # …Ë÷√∆Ù∂ØœÓ
-set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT gspscript)
+set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT dbscript)
