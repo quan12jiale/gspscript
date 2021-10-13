@@ -1,4 +1,5 @@
 #include "GTJRunnable.h"
+#include <QDirIterator>
 
 // 定义全局变量，用于发生异常时定位文件
 QString g_strGSPFile = QString();
@@ -222,33 +223,79 @@ QList<Options> modifySingleGSP(bool bSingleGSP) // 默认为true
 	return lstOption;
 }
 
+bool addTypeMatchExpr(GSPDatabase m_pDb) // 临时函数
+{
+	GSPTable dbtable;
+	dbtable = m_pDb.findTable(ptnQtyCalcRule);
+
+	QString expr = QStringLiteral("Pos('嵌缝打胶',Description)>0");
+	GSPView ipView;
+	ipView = dbtable.createStaticView(expr);
+	int nAddrCnt = ipView.recordCount();
+	if (nAddrCnt == 0)
+	{
+		return false;
+	}
+	if (nAddrCnt != 3)
+	{
+		QString errMessage = QStringLiteral("InternalQtyCalcRule的最大id和最后一条记录的id不同");
+		qDebug() << errMessage;
+		system("pause");
+		exit(0);
+	}
+
+	for (int k = 0; k < nAddrCnt; k++)
+	{
+		GSPRecord dbrecord = ipView.records(k);
+		dbrecord.setAsWideString(pfnMatchExpr, "(Type = 2) or (Type = 3)");
+	}
+	return true;
+}
+
+void addGSPCalcRuleTmp(const QString& dbpath) // 临时函数
+{
+	GSPModel ipGSPModel = gspEngine().createModel();
+	GSPModelPersistent(ipGSPModel).loadFromFile(dbpath);
+	ipGSPModel.setMode(gmRuntime);
+	SCOPE_EXIT
+	{
+		GSPModelPersistent(ipGSPModel).saveToFile(dbpath);
+	};
+
+	GSPDatabase m_pDb;
+	m_pDb = ipGSPModel.find(pdnBQCalcRule);
+	if (!addTypeMatchExpr(m_pDb))
+	{
+		qDebug() << dbpath;
+	}
+
+	m_pDb = ipGSPModel.find(pdnNormCalcRule);
+	if (!addTypeMatchExpr(m_pDb))
+	{
+		qDebug() << dbpath;
+	}
+}
+
+void walk(const QString& absolute_path, QStringList& list)
+{
+	QDirIterator it(absolute_path, QStringList() << "RegionRule_Calc.GSP", QDir::Files, QDirIterator::Subdirectories);
+	while (it.hasNext()) {
+		list.append(it.next());
+	}
+}
+
 void modifyMultiGSP()
 {
-	QList<Options> lstOption = modifySingleGSP(false);
-
-	// !!! 规则库路径，这里填备份的路径，会直接修改该路径文件
-	QString strFilesDir = QString::fromLocal8Bit("F:/Files");
-	QStringList oFileList;
-	QStringList oNameFilter;
-	oNameFilter << "";
-	getFiles(strFilesDir, oNameFilter, oFileList, true);
-
-	int maximum = oFileList.count();
+	QString strFilesDir = QStringLiteral("C:/Users/quanjl/Desktop/RegionRule （1.0.31.0成长同步）-2021.9.30开始更新中");//!!!规则库目录
+	QStringList filelist;
+	walk(strFilesDir, filelist);
+	int maximum = filelist.count();
+	qDebug() << QStringLiteral("总共有[%1]个文件").arg(maximum);
 	for (int i = 0; i < maximum; ++i)
 	{
-		QString strFileName = oFileList.at(i);
-		QString sExtractFile = strFilesDir + '/' + strFileName;
-		if (sExtractFile.endsWith("CalcRulePermission.gip", Qt::CaseInsensitive))
-		{
-			continue;
-		}
-		if (sameStr(extractFileExt(strFileName), ".gip"))
-		{
-			handleGIPFile(sExtractFile, lstOption);
-		}
-		else
-		{
-			continue;
-		}
+		QString path = filelist.at(i);
+		addGSPCalcRuleTmp(path);
+		printf("\r正在处理第[%d]个文件", i + 1);// \r回到本行的开头，刷新进度
 	}
+	printf("\n");
 }

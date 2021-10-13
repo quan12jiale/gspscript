@@ -641,9 +641,10 @@ int main(int argc, char *argv[])
 	//modifySingleGSP(true);
 
 	const QString dbpath = "C:\\Users\\quanjl\\Desktop\\RegionRule_Calc.GSP";
-	addGSPBusiness(dbpath);
-	addGSPCalcRule(dbpath);
-	addCalcSettingField(dbpath);
+// 	addGSPBusiness(dbpath);
+// 	addGSPCalcRule(dbpath);
+// 	addCalcSettingField(dbpath);
+	modifyMultiGSP();
 
 	qDebug() << QStringLiteral("用时 %1 s").arg(oTime.elapsed() / 1000);
 	system("pause");
