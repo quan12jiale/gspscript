@@ -152,7 +152,7 @@ void addBusiness(GSPDatabase m_pDb)
 		dbrecord.setAsInteger(pfnSubjectElementTypeID, 1204);
 		//
 		dbrecord.setAsWideString(pfnCode, "YSHXCD");
-		dbrecord.setAsWideString(pfnDescription, QStringLiteral("原始长度"));
+		dbrecord.setAsWideString(pfnDescription, QStringLiteral("横向原始长度"));
 		dbrecord.setAsWideString(pfnUnit, "m");
 		dbrecord.setAsBoolean(pfnNullEnable, false);
 		dbtable.append(dbrecord);
@@ -162,7 +162,7 @@ void addBusiness(GSPDatabase m_pDb)
 		dbrecord.setAsInteger(pfnSubjectElementTypeID, 1204);
 		dbrecord.setAsInteger(pfnObjectElementTypeID, 4);
 		dbrecord.setAsWideString(pfnCode, "KMHXCD");
-		dbrecord.setAsWideString(pfnDescription, QStringLiteral("扣门长度"));
+		dbrecord.setAsWideString(pfnDescription, QStringLiteral("横向打胶嵌缝扣门长度"));
 		dbrecord.setAsWideString(pfnUnit, "m");
 		dbtable.append(dbrecord);
 		
@@ -171,7 +171,7 @@ void addBusiness(GSPDatabase m_pDb)
 		dbrecord.setAsInteger(pfnSubjectElementTypeID, 1204);
 		dbrecord.setAsInteger(pfnObjectElementTypeID, 5);
 		dbrecord.setAsWideString(pfnCode, "KCHXCD");
-		dbrecord.setAsWideString(pfnDescription, QStringLiteral("扣窗长度"));
+		dbrecord.setAsWideString(pfnDescription, QStringLiteral("横向打胶嵌缝扣窗长度"));
 		dbrecord.setAsWideString(pfnUnit, "m");
 		dbtable.append(dbrecord);
 
@@ -180,7 +180,7 @@ void addBusiness(GSPDatabase m_pDb)
 		dbrecord.setAsInteger(pfnSubjectElementTypeID, 1204);
 		dbrecord.setAsInteger(pfnObjectElementTypeID, 6);
 		dbrecord.setAsWideString(pfnCode, "KMLCHXCD");
-		dbrecord.setAsWideString(pfnDescription, QStringLiteral("扣门联窗长度"));
+		dbrecord.setAsWideString(pfnDescription, QStringLiteral("横向打胶嵌缝扣门联窗长度"));
 		dbrecord.setAsWideString(pfnUnit, "m");
 		dbtable.append(dbrecord);
 
@@ -189,7 +189,7 @@ void addBusiness(GSPDatabase m_pDb)
 		dbrecord.setAsInteger(pfnSubjectElementTypeID, 1204);
 		dbrecord.setAsInteger(pfnObjectElementTypeID, 7);
 		dbrecord.setAsWideString(pfnCode, "KDHXCD");
-		dbrecord.setAsWideString(pfnDescription, QStringLiteral("扣洞长度"));
+		dbrecord.setAsWideString(pfnDescription, QStringLiteral("横向打胶嵌缝扣洞长度"));
 		dbrecord.setAsWideString(pfnUnit, "m");
 		dbtable.append(dbrecord);
 
@@ -198,7 +198,7 @@ void addBusiness(GSPDatabase m_pDb)
 		dbrecord.setAsInteger(pfnSubjectElementTypeID, 1204);
 		dbrecord.setAsInteger(pfnObjectElementTypeID, 8);
 		dbrecord.setAsWideString(pfnCode, "KDXCHXCD");
-		dbrecord.setAsWideString(pfnDescription, QStringLiteral("扣带形窗长度"));
+		dbrecord.setAsWideString(pfnDescription, QStringLiteral("横向打胶嵌缝扣带形窗长度"));
 		dbrecord.setAsWideString(pfnUnit, "m");
 		dbtable.append(dbrecord);
 
@@ -207,7 +207,7 @@ void addBusiness(GSPDatabase m_pDb)
 		dbrecord.setAsInteger(pfnSubjectElementTypeID, 1204);
 		dbrecord.setAsInteger(pfnObjectElementTypeID, 9);
 		dbrecord.setAsWideString(pfnCode, "KDXDHXCD");
-		dbrecord.setAsWideString(pfnDescription, QStringLiteral("扣带形洞长度"));
+		dbrecord.setAsWideString(pfnDescription, QStringLiteral("横向打胶嵌缝扣带形洞长度"));
 		dbrecord.setAsWideString(pfnUnit, "m");
 		dbtable.append(dbrecord);
 	}
@@ -218,7 +218,7 @@ void addBusiness(GSPDatabase m_pDb)
 		dbrecord.setAsInteger(pfnSubjectElementTypeID, 1204);
 		//
 		dbrecord.setAsWideString(pfnCode, "YSSXCD");
-		dbrecord.setAsWideString(pfnDescription, QStringLiteral("原始长度"));
+		dbrecord.setAsWideString(pfnDescription, QStringLiteral("竖向原始长度"));
 		dbrecord.setAsWideString(pfnUnit, "m");
 		dbrecord.setAsBoolean(pfnNullEnable, false);
 		dbtable.append(dbrecord);
@@ -228,7 +228,7 @@ void addBusiness(GSPDatabase m_pDb)
 		dbrecord.setAsInteger(pfnSubjectElementTypeID, 1204);
 		dbrecord.setAsInteger(pfnObjectElementTypeID, 4);
 		dbrecord.setAsWideString(pfnCode, "KMSXCD");
-		dbrecord.setAsWideString(pfnDescription, QStringLiteral("扣门长度"));
+		dbrecord.setAsWideString(pfnDescription, QStringLiteral("竖向打胶嵌缝扣门长度"));
 		dbrecord.setAsWideString(pfnUnit, "m");
 		dbtable.append(dbrecord);
 
@@ -237,7 +237,7 @@ void addBusiness(GSPDatabase m_pDb)
 		dbrecord.setAsInteger(pfnSubjectElementTypeID, 1204);
 		dbrecord.setAsInteger(pfnObjectElementTypeID, 5);
 		dbrecord.setAsWideString(pfnCode, "KCSXCD");
-		dbrecord.setAsWideString(pfnDescription, QStringLiteral("扣窗长度"));
+		dbrecord.setAsWideString(pfnDescription, QStringLiteral("竖向打胶嵌缝扣窗长度"));
 		dbrecord.setAsWideString(pfnUnit, "m");
 		dbtable.append(dbrecord);
 
@@ -246,7 +246,7 @@ void addBusiness(GSPDatabase m_pDb)
 		dbrecord.setAsInteger(pfnSubjectElementTypeID, 1204);
 		dbrecord.setAsInteger(pfnObjectElementTypeID, 6);
 		dbrecord.setAsWideString(pfnCode, "KMLCSXCD");
-		dbrecord.setAsWideString(pfnDescription, QStringLiteral("扣门联窗长度"));
+		dbrecord.setAsWideString(pfnDescription, QStringLiteral("竖向打胶嵌缝扣门联窗长度"));
 		dbrecord.setAsWideString(pfnUnit, "m");
 		dbtable.append(dbrecord);
 
@@ -255,7 +255,7 @@ void addBusiness(GSPDatabase m_pDb)
 		dbrecord.setAsInteger(pfnSubjectElementTypeID, 1204);
 		dbrecord.setAsInteger(pfnObjectElementTypeID, 7);
 		dbrecord.setAsWideString(pfnCode, "KDSXCD");
-		dbrecord.setAsWideString(pfnDescription, QStringLiteral("扣洞长度"));
+		dbrecord.setAsWideString(pfnDescription, QStringLiteral("竖向打胶嵌缝扣洞长度"));
 		dbrecord.setAsWideString(pfnUnit, "m");
 		dbtable.append(dbrecord);
 
@@ -264,7 +264,7 @@ void addBusiness(GSPDatabase m_pDb)
 		dbrecord.setAsInteger(pfnSubjectElementTypeID, 1204);
 		dbrecord.setAsInteger(pfnObjectElementTypeID, 8);
 		dbrecord.setAsWideString(pfnCode, "KDXCSXCD");
-		dbrecord.setAsWideString(pfnDescription, QStringLiteral("扣带形窗长度"));
+		dbrecord.setAsWideString(pfnDescription, QStringLiteral("竖向打胶嵌缝扣带形窗长度"));
 		dbrecord.setAsWideString(pfnUnit, "m");
 		dbtable.append(dbrecord);
 
@@ -273,7 +273,7 @@ void addBusiness(GSPDatabase m_pDb)
 		dbrecord.setAsInteger(pfnSubjectElementTypeID, 1204);
 		dbrecord.setAsInteger(pfnObjectElementTypeID, 9);
 		dbrecord.setAsWideString(pfnCode, "KDXDSXCD");
-		dbrecord.setAsWideString(pfnDescription, QStringLiteral("扣带形洞长度"));
+		dbrecord.setAsWideString(pfnDescription, QStringLiteral("竖向打胶嵌缝扣带形洞长度"));
 		dbrecord.setAsWideString(pfnUnit, "m");
 		dbtable.append(dbrecord);
 	}
@@ -451,7 +451,7 @@ void addCalcRule(GSPDatabase m_pDb)
 		GSPRecord dbrecord;
 		dbrecord = dbtable.newRecord();
 		dbrecord.setAsInteger(pfnInternalQtyID, nMaxInternalQtyDictInternalQtyID + 1);
-		dbrecord.setAsWideString(pfnDescription, QStringLiteral("原始长度"));
+		dbrecord.setAsWideString(pfnDescription, QStringLiteral("横向打胶嵌缝原始长度"));
 		dbrecord.setAsInteger(pfnDefaultCalcRuleID, nMaxInternalQtyCalcRuleID + 1);
 		dbrecord.setAsInteger(pfnCalcRuleID, nMaxInternalQtyCalcRuleID + 1);
 		dbrecord.setAsInteger(pfnCheckBuildNo, 0);
@@ -459,7 +459,7 @@ void addCalcRule(GSPDatabase m_pDb)
 
 		dbrecord = dbtable.newRecord();
 		dbrecord.setAsInteger(pfnInternalQtyID, nMaxInternalQtyDictInternalQtyID + 2);
-		dbrecord.setAsWideString(pfnDescription, QStringLiteral("扣门长度"));
+		dbrecord.setAsWideString(pfnDescription, QStringLiteral("横向打胶嵌缝扣门长度"));
 		dbrecord.setAsInteger(pfnDefaultCalcRuleID, nMaxInternalQtyCalcRuleID + 2);
 		dbrecord.setAsInteger(pfnCalcRuleID, nMaxInternalQtyCalcRuleID + 2);
 		dbrecord.setAsInteger(pfnCheckBuildNo, 0);
@@ -467,7 +467,7 @@ void addCalcRule(GSPDatabase m_pDb)
 
 		dbrecord = dbtable.newRecord();
 		dbrecord.setAsInteger(pfnInternalQtyID, nMaxInternalQtyDictInternalQtyID + 3);
-		dbrecord.setAsWideString(pfnDescription, QStringLiteral("扣窗长度"));
+		dbrecord.setAsWideString(pfnDescription, QStringLiteral("横向打胶嵌缝扣窗长度"));
 		dbrecord.setAsInteger(pfnDefaultCalcRuleID, nMaxInternalQtyCalcRuleID + 3);
 		dbrecord.setAsInteger(pfnCalcRuleID, nMaxInternalQtyCalcRuleID + 3);
 		dbrecord.setAsInteger(pfnCheckBuildNo, 0);
@@ -475,7 +475,7 @@ void addCalcRule(GSPDatabase m_pDb)
 
 		dbrecord = dbtable.newRecord();
 		dbrecord.setAsInteger(pfnInternalQtyID, nMaxInternalQtyDictInternalQtyID + 4);
-		dbrecord.setAsWideString(pfnDescription, QStringLiteral("扣门联窗长度"));
+		dbrecord.setAsWideString(pfnDescription, QStringLiteral("横向打胶嵌缝扣门联窗长度"));
 		dbrecord.setAsInteger(pfnDefaultCalcRuleID, nMaxInternalQtyCalcRuleID + 4);
 		dbrecord.setAsInteger(pfnCalcRuleID, nMaxInternalQtyCalcRuleID + 4);
 		dbrecord.setAsInteger(pfnCheckBuildNo, 0);
@@ -483,7 +483,7 @@ void addCalcRule(GSPDatabase m_pDb)
 
 		dbrecord = dbtable.newRecord();
 		dbrecord.setAsInteger(pfnInternalQtyID, nMaxInternalQtyDictInternalQtyID + 5);
-		dbrecord.setAsWideString(pfnDescription, QStringLiteral("扣洞长度"));
+		dbrecord.setAsWideString(pfnDescription, QStringLiteral("横向打胶嵌缝扣洞长度"));
 		dbrecord.setAsInteger(pfnDefaultCalcRuleID, nMaxInternalQtyCalcRuleID + 5);
 		dbrecord.setAsInteger(pfnCalcRuleID, nMaxInternalQtyCalcRuleID + 5);
 		dbrecord.setAsInteger(pfnCheckBuildNo, 0);
@@ -491,7 +491,7 @@ void addCalcRule(GSPDatabase m_pDb)
 
 		dbrecord = dbtable.newRecord();
 		dbrecord.setAsInteger(pfnInternalQtyID, nMaxInternalQtyDictInternalQtyID + 6);
-		dbrecord.setAsWideString(pfnDescription, QStringLiteral("扣带形窗长度"));
+		dbrecord.setAsWideString(pfnDescription, QStringLiteral("横向打胶嵌缝扣带形窗长度"));
 		dbrecord.setAsInteger(pfnDefaultCalcRuleID, nMaxInternalQtyCalcRuleID + 6);
 		dbrecord.setAsInteger(pfnCalcRuleID, nMaxInternalQtyCalcRuleID + 6);
 		dbrecord.setAsInteger(pfnCheckBuildNo, 0);
@@ -499,7 +499,7 @@ void addCalcRule(GSPDatabase m_pDb)
 
 		dbrecord = dbtable.newRecord();
 		dbrecord.setAsInteger(pfnInternalQtyID, nMaxInternalQtyDictInternalQtyID + 7);
-		dbrecord.setAsWideString(pfnDescription, QStringLiteral("扣带形洞长度"));
+		dbrecord.setAsWideString(pfnDescription, QStringLiteral("横向打胶嵌缝扣带形洞长度"));
 		dbrecord.setAsInteger(pfnDefaultCalcRuleID, nMaxInternalQtyCalcRuleID + 7);
 		dbrecord.setAsInteger(pfnCalcRuleID, nMaxInternalQtyCalcRuleID + 7);
 		dbrecord.setAsInteger(pfnCheckBuildNo, 0);
@@ -509,7 +509,7 @@ void addCalcRule(GSPDatabase m_pDb)
 		GSPRecord dbrecord;
 		dbrecord = dbtable.newRecord();
 		dbrecord.setAsInteger(pfnInternalQtyID, nMaxInternalQtyDictInternalQtyID + 8);
-		dbrecord.setAsWideString(pfnDescription, QStringLiteral("原始长度"));
+		dbrecord.setAsWideString(pfnDescription, QStringLiteral("竖向打胶嵌缝原始长度"));
 		dbrecord.setAsInteger(pfnDefaultCalcRuleID, nMaxInternalQtyCalcRuleID + 8);
 		dbrecord.setAsInteger(pfnCalcRuleID, nMaxInternalQtyCalcRuleID + 8);
 		dbrecord.setAsInteger(pfnCheckBuildNo, 0);
@@ -517,7 +517,7 @@ void addCalcRule(GSPDatabase m_pDb)
 
 		dbrecord = dbtable.newRecord();
 		dbrecord.setAsInteger(pfnInternalQtyID, nMaxInternalQtyDictInternalQtyID + 9);
-		dbrecord.setAsWideString(pfnDescription, QStringLiteral("扣门长度"));
+		dbrecord.setAsWideString(pfnDescription, QStringLiteral("竖向打胶嵌缝扣门长度"));
 		dbrecord.setAsInteger(pfnDefaultCalcRuleID, nMaxInternalQtyCalcRuleID + 9);
 		dbrecord.setAsInteger(pfnCalcRuleID, nMaxInternalQtyCalcRuleID + 9);
 		dbrecord.setAsInteger(pfnCheckBuildNo, 0);
@@ -525,7 +525,7 @@ void addCalcRule(GSPDatabase m_pDb)
 
 		dbrecord = dbtable.newRecord();
 		dbrecord.setAsInteger(pfnInternalQtyID, nMaxInternalQtyDictInternalQtyID + 10);
-		dbrecord.setAsWideString(pfnDescription, QStringLiteral("扣窗长度"));
+		dbrecord.setAsWideString(pfnDescription, QStringLiteral("竖向打胶嵌缝扣窗长度"));
 		dbrecord.setAsInteger(pfnDefaultCalcRuleID, nMaxInternalQtyCalcRuleID + 10);
 		dbrecord.setAsInteger(pfnCalcRuleID, nMaxInternalQtyCalcRuleID + 10);
 		dbrecord.setAsInteger(pfnCheckBuildNo, 0);
@@ -533,7 +533,7 @@ void addCalcRule(GSPDatabase m_pDb)
 
 		dbrecord = dbtable.newRecord();
 		dbrecord.setAsInteger(pfnInternalQtyID, nMaxInternalQtyDictInternalQtyID + 11);
-		dbrecord.setAsWideString(pfnDescription, QStringLiteral("扣门联窗长度"));
+		dbrecord.setAsWideString(pfnDescription, QStringLiteral("竖向打胶嵌缝扣门联窗长度"));
 		dbrecord.setAsInteger(pfnDefaultCalcRuleID, nMaxInternalQtyCalcRuleID + 11);
 		dbrecord.setAsInteger(pfnCalcRuleID, nMaxInternalQtyCalcRuleID + 11);
 		dbrecord.setAsInteger(pfnCheckBuildNo, 0);
@@ -541,7 +541,7 @@ void addCalcRule(GSPDatabase m_pDb)
 
 		dbrecord = dbtable.newRecord();
 		dbrecord.setAsInteger(pfnInternalQtyID, nMaxInternalQtyDictInternalQtyID + 12);
-		dbrecord.setAsWideString(pfnDescription, QStringLiteral("扣洞长度"));
+		dbrecord.setAsWideString(pfnDescription, QStringLiteral("竖向打胶嵌缝扣洞长度"));
 		dbrecord.setAsInteger(pfnDefaultCalcRuleID, nMaxInternalQtyCalcRuleID + 12);
 		dbrecord.setAsInteger(pfnCalcRuleID, nMaxInternalQtyCalcRuleID + 12);
 		dbrecord.setAsInteger(pfnCheckBuildNo, 0);
@@ -549,7 +549,7 @@ void addCalcRule(GSPDatabase m_pDb)
 
 		dbrecord = dbtable.newRecord();
 		dbrecord.setAsInteger(pfnInternalQtyID, nMaxInternalQtyDictInternalQtyID + 13);
-		dbrecord.setAsWideString(pfnDescription, QStringLiteral("扣带形窗长度"));
+		dbrecord.setAsWideString(pfnDescription, QStringLiteral("竖向打胶嵌缝扣带形窗长度"));
 		dbrecord.setAsInteger(pfnDefaultCalcRuleID, nMaxInternalQtyCalcRuleID + 13);
 		dbrecord.setAsInteger(pfnCalcRuleID, nMaxInternalQtyCalcRuleID + 13);
 		dbrecord.setAsInteger(pfnCheckBuildNo, 0);
@@ -557,7 +557,7 @@ void addCalcRule(GSPDatabase m_pDb)
 
 		dbrecord = dbtable.newRecord();
 		dbrecord.setAsInteger(pfnInternalQtyID, nMaxInternalQtyDictInternalQtyID + 14);
-		dbrecord.setAsWideString(pfnDescription, QStringLiteral("扣带形洞长度"));
+		dbrecord.setAsWideString(pfnDescription, QStringLiteral("竖向打胶嵌缝扣带形洞长度"));
 		dbrecord.setAsInteger(pfnDefaultCalcRuleID, nMaxInternalQtyCalcRuleID + 14);
 		dbrecord.setAsInteger(pfnCalcRuleID, nMaxInternalQtyCalcRuleID + 14);
 		dbrecord.setAsInteger(pfnCheckBuildNo, 0);
