@@ -223,33 +223,80 @@ QList<Options> modifySingleGSP(bool bSingleGSP) // 默认为true
 	return lstOption;
 }
 
-bool addTypeMatchExpr(GSPDatabase m_pDb) // 临时函数
+const QRegExp emptyRe("\\s+");//匹配任意空白字符的正则，弄一个全局变量，而不是局部变量，提高字符串替换效率
+bool addTypeMatchExpr(GSPDatabase m_pDb, int nQtyID) // 临时函数
 {
 	GSPTable dbtable;
 	dbtable = m_pDb.findTable(ptnQtyCalcRule);
 
-	QString expr = QStringLiteral("Pos('嵌缝打胶',Description)>0");
+	QString expr = QStringLiteral("QtyID=%1").arg(nQtyID);
 	GSPView ipView;
 	ipView = dbtable.createStaticView(expr);
 	int nAddrCnt = ipView.recordCount();
 	if (nAddrCnt == 0)
 	{
-		return false;
-	}
-	if (nAddrCnt != 3)
-	{
-		QString errMessage = QStringLiteral("InternalQtyCalcRule的最大id和最后一条记录的id不同");
-		qDebug() << errMessage;
-		system("pause");
-		exit(0);
+		return true;
 	}
 
 	for (int k = 0; k < nAddrCnt; k++)
 	{
 		GSPRecord dbrecord = ipView.records(k);
-		dbrecord.setAsWideString(pfnMatchExpr, "(Type = 2) or (Type = 3)");
+		QString strMatchExpr = dbrecord.asString(pfnMatchExpr);
+		strMatchExpr.replace(emptyRe, "");
+		if (strMatchExpr.isEmpty())
+		{
+			return true;
+		}
+		if (strMatchExpr.contains("Material") && strMatchExpr.contains("Type"))
+		{
+			if (strMatchExpr.contains("Material=31801") && strMatchExpr.contains("Type=252"))
+			{
+				return true;
+			}
+		}
+		else if (strMatchExpr.contains("Material=31801"))
+		{
+			return true;
+		}
+		else if (strMatchExpr.contains("Type=252"))
+		{
+			return true;
+		}
 	}
-	return true;
+	return false;
+}
+
+const QString strMJ = QStringLiteral("面积");
+const QString strTJ = QStringLiteral("体积");
+const QString strMBMJ = QStringLiteral("模板面积");
+const QString strGSWP = QStringLiteral("钢丝网片");
+void getQtyID(GSPDatabase pBusinessDb, GSPDatabase pBQCalcRuleDb, GSPDatabase pNormCalcRuleDb, const QString& dbpath) // 临时函数
+{
+	GSPTable dbtable;
+	dbtable = pBusinessDb.findTable(ptnQtyDict);
+
+	QString expr = QStringLiteral("ElementTypeID=0");
+	GSPView ipView;
+	ipView = dbtable.createStaticView(expr);
+	int nAddrCnt = ipView.recordCount();
+	for (int k = 0; k < nAddrCnt; k++)
+	{
+		GSPRecord dbrecord = ipView.records(k);
+		QString strDesc = dbrecord.asString(pfnDescription);
+		strDesc = strDesc.trimmed();
+		if (strDesc == strMJ || strDesc == strTJ || strDesc == strMBMJ || strDesc.contains(strGSWP))
+		{
+			int nQtyID = dbrecord.asInteger(pfnQtyID);
+			if (!addTypeMatchExpr(pBQCalcRuleDb, nQtyID))
+			{
+				qDebug() << dbpath << QStringLiteral("    清单    ：   %1    匹配表达式缺少Material=31801或Type=252").arg(strDesc);
+			}
+			if (!addTypeMatchExpr(pNormCalcRuleDb, nQtyID))
+			{
+				qDebug() << dbpath << QStringLiteral("    定额    ：   %1    匹配表达式缺少Material=31801或Type=252").arg(strDesc);
+			}
+		}
+	}
 }
 
 void addGSPCalcRuleTmp(const QString& dbpath) // 临时函数
@@ -259,21 +306,13 @@ void addGSPCalcRuleTmp(const QString& dbpath) // 临时函数
 	ipGSPModel.setMode(gmRuntime);
 	SCOPE_EXIT
 	{
-		GSPModelPersistent(ipGSPModel).saveToFile(dbpath);
+		//GSPModelPersistent(ipGSPModel).saveToFile(dbpath);
 	};
 
-	GSPDatabase m_pDb;
-	m_pDb = ipGSPModel.find(pdnBQCalcRule);
-	if (!addTypeMatchExpr(m_pDb))
-	{
-		qDebug() << dbpath;
-	}
-
-	m_pDb = ipGSPModel.find(pdnNormCalcRule);
-	if (!addTypeMatchExpr(m_pDb))
-	{
-		qDebug() << dbpath;
-	}
+	GSPDatabase pBusinessDb = ipGSPModel.find(pdnBusiness);
+	GSPDatabase pBQCalcRuleDb = ipGSPModel.find(pdnBQCalcRule);
+	GSPDatabase pNormCalcRuleDb = ipGSPModel.find(pdnNormCalcRule);
+	getQtyID(pBusinessDb, pBQCalcRuleDb, pNormCalcRuleDb, dbpath);
 }
 
 void walk(const QString& absolute_path, QStringList& list)
@@ -286,7 +325,7 @@ void walk(const QString& absolute_path, QStringList& list)
 
 void modifyMultiGSP()
 {
-	QString strFilesDir = QStringLiteral("C:/Users/quanjl/Desktop/RegionRule （1.0.31.0成长同步）-2021.9.30开始更新中");//!!!规则库目录
+	QString strFilesDir = QStringLiteral("E:/成长同步完的库");//!!!规则库目录
 	QStringList filelist;
 	walk(strFilesDir, filelist);
 	int maximum = filelist.count();
@@ -295,7 +334,7 @@ void modifyMultiGSP()
 	{
 		QString path = filelist.at(i);
 		addGSPCalcRuleTmp(path);
-		printf("\r正在处理第[%d]个文件", i + 1);// \r回到本行的开头，刷新进度
+		//printf("\r正在处理第[%d]个文件", i + 1);// \r回到本行的开头，刷新进度
 	}
 	printf("\n");
 }
