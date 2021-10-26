@@ -1,4 +1,5 @@
-﻿#include "amd.h"
+﻿#include "libxlUtils.h"
+#include "amd.h"
 #include <QDir>
 #include <QFile>
 #include <QRegularExpression>
@@ -85,6 +86,7 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);//这一行用于消除"Please instantiate the QApplication object first"警告信息
 
+#if 0
 	QRegularExpression sep("\\s+");
 
 	QString batPath = "E:/IntegrationForGrowingQZGQ_0811/resource/json/QZGQ/3-addrecord.bat";
@@ -157,7 +159,12 @@ int main(int argc, char *argv[])
 			}
 		}
 	}
-
+#else
+	std::wstring strExcelFilePath = L"C:/Users/quanjl/Desktop/宁夏地区模型材质.xlsx";
+	LibxlUtils* pLibxl = new LibxlUtils;
+	pLibxl->exportToExcel(strExcelFilePath);
+	delete pLibxl;
+#endif
 	system("pause");
     return 0;
 }
