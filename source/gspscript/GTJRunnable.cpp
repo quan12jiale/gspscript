@@ -1,4 +1,5 @@
 #include "GTJRunnable.h"
+#include "GCPPMatchQueryVarValue.h"
 #include <QDirIterator>
 
 // 定义全局变量，用于发生异常时定位文件
@@ -242,11 +243,18 @@ bool addTypeMatchExpr(GSPDatabase m_pDb, int nQtyID) // 临时函数
 	{
 		GSPRecord dbrecord = ipView.records(k);
 		QString strMatchExpr = dbrecord.asString(pfnMatchExpr);
+		QString strErr;
+		if (!doCheckExpr(strMatchExpr, strErr))
+		{
+			return false;
+		}
+
 		strMatchExpr.replace(emptyRe, "");
 		if (strMatchExpr.isEmpty())
 		{
 			return true;
 		}
+
 		if (strMatchExpr.contains("Material") && strMatchExpr.contains("Type"))
 		{
 			if (strMatchExpr.contains("Material=31801") && strMatchExpr.contains("Type=252"))

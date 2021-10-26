@@ -1,4 +1,5 @@
 ﻿#include "GTJRunnable.h"
+#include "GCPPMatchQueryVarValue.h"
 
 void setExtProp(GSPFieldSchema oField, const QString& strExtPropCode, const QString& strExtPropValue)
 {
@@ -644,7 +645,11 @@ int main(int argc, char *argv[])
 // 	addGSPBusiness(dbpath);
 // 	addGSPCalcRule(dbpath);
 // 	addCalcSettingField(dbpath);
-	modifyMultiGSP();
+	//modifyMultiGSP();
+
+	QString sExpr = "((Material = 8) or (Material = 9) or (Material = 10) or (Material = 11)))";
+	QString strErr;
+	doCheckExpr(sExpr, strErr);
 
 	qDebug() << QStringLiteral("用时 %1 s").arg(oTime.elapsed() / 1000);
 	system("pause");
