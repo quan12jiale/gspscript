@@ -4,11 +4,13 @@
 class GCPPMatchQueryVarValue : virtual public GEPQueryVarDataTypeImpl, virtual public GEPQueryVarValueImpl
 {
 public:
-	virtual void queryVarDataType(GEPVarNode & node, GEPDataType & dataType, void * info);
+	GCPPMatchQueryVarValue(long nInnerOuterFlag = 0);
+	virtual void queryVarDataType(GEPVarNode& node, GEPDataType& dataType, void* info);
 
-	virtual void queryVarValue(GEPVarNode & node, void * info);
+	virtual void queryVarValue(GEPVarNode& node, void* info);
 private:
-	bool UsePrivateProperty;
+	const long m_nInnerOuterFlag;
 };
 
-bool doCheckExpr(const QString& sExpr, QString& strErr);
+bool doCheckExprIsValid(const QString& sExpr, QString& strErr);
+bool doCheckExprIsMatch(const QString& sExpr, QString& strErr);

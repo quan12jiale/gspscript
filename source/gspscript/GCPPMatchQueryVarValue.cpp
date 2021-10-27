@@ -5,87 +5,109 @@
 #include <QScopedPointer>
 
 const QString gpfnMaterial = "Material";                   // 材质
-const QString gpfnMaterialClassify = "Classify";                   // 材质
+const QString gpfnBottomMaterial = "BottomMaterial";       // 底座材质
+const QString gpfnClassify = "Classify";                   
 const QString gpfnType = "Type";
-
-const QString gpfnShortArmShearWall = "ShortArmShearWall";          // 判断短肢剪力墙
-const QString gpfnShortArmShearWallVol = "ShortArmShearWallVol";       // 判断短肢剪力墙(体积)
-
-const QString gpfnHuarunCGMBMJforColumn = "HuarunCGMBMJforColumn";        // 柱：超高模板面积匹配条件
-const QString gpfnHuarunCGMBMJforTieColumn = "HuarunCGMBMJforTieColumn";  // 构造柱：超高模板面积匹配条件
-const QString gpfnHuarunCGMBMJforBeam = "HuarunCGMBMJforBeam";            // 梁：超高模板面积匹配条件
-const QString gpfnHuarunCGMBMJforLinkBeam = "HuarunCGMBMJforLinkBeam";    // 连梁：超高模板面积匹配条件
-const QString gpfnHuarunCGMBMJforForceWall = "HuarunCGMBMJforForceWall";  // 剪力墙：超高模板面积匹配条件
-const QString gpfnHuarunCGMBMJforBoad = "HuarunCGMBMJforBoad";            // 板：超高模板面积匹配条件
-const QString gpfnHuarunCGCMMBMJforBoad = "HuarunCGCMMBMJforBoad";        // 板：超高侧面匹配条件
+const QString gpfnInnerOuterFlag = "InnerOuterFlag";
 
 
-void GCPPMatchQueryVarValue::queryVarDataType(GEPVarNode & node, GEPDataType & dataType, void * info)
+GCPPMatchQueryVarValue::GCPPMatchQueryVarValue(long nInnerOuterFlag /*= 0*/)
+	: m_nInnerOuterFlag(nInnerOuterFlag)
 {
-	dataType = edtInteger;
-#if 0
-	if (sameStr(node.varCode(), gpfnMaterial) || sameStr(node.varCode(), "BottomMaterial"))
-	{
-		UsePrivateProperty = true;
-		dataType = edtInteger;
-	}
-	else if (sameStr(node.varCode(), gpfnMaterialClassify))
-	{
-		dataType = edtInteger;
-	}
-	else if (sameStr(node.varCode(), gpfnType))
-	{
-		dataType = edtInteger;
-	}
-	else if (sameStr(node.varCode(), gpfnShortArmShearWall))
-	{
-		UsePrivateProperty = true;
-		dataType = edtInteger;
-	}
-	else if (sameStr(node.varCode(), gpfnShortArmShearWallVol))
-	{
-		UsePrivateProperty = true;
-		dataType = edtInteger;
-	}
-	else if (sameStr(node.varCode(), gpfnHuarunCGMBMJforColumn) || sameStr(node.varCode(), gpfnHuarunCGMBMJforTieColumn)
-		|| sameStr(node.varCode(), gpfnHuarunCGMBMJforBeam) || sameStr(node.varCode(), gpfnHuarunCGMBMJforLinkBeam)
-		|| sameStr(node.varCode(), gpfnHuarunCGMBMJforForceWall)
-		|| sameStr(node.varCode(), gpfnHuarunCGMBMJforBoad) || sameStr(node.varCode(), gpfnHuarunCGCMMBMJforBoad))
-	{
-		UsePrivateProperty = true;
-		dataType = edtInteger;
-	}
-	else
-	{
-		dataType = edtInteger;
-	}
-#endif
+
 }
 
-void GCPPMatchQueryVarValue::queryVarValue(GEPVarNode & node, void * info)
+void GCPPMatchQueryVarValue::queryVarDataType(GEPVarNode& node, GEPDataType& dataType, void* info)
+{
+	dataType = edtInteger;
+}
+
+void GCPPMatchQueryVarValue::queryVarValue(GEPVarNode& node, void* info)
 {
 	QString AVarCode = node.varCode();
 	GEPData AData = node.data();
-	AData.setAsInteger(1);
+	long value = m_nInnerOuterFlag;
+	if (sameStr(AVarCode, gpfnMaterial))
+	{
+		value = 31801;//材质为31801
+	}
+	else if (sameStr(AVarCode, gpfnBottomMaterial))
+	{
+		value = 31813;//BottomMaterial为31813
+	}
+	else if (sameStr(AVarCode, gpfnClassify))
+	{
+		value = 8;//Classify为8
+	}
+	else if (sameStr(AVarCode, gpfnType))
+	{
+		value = 252;//Type为252
+	}
+	AData.setAsInteger(value);
 }
 
-bool doCheckExpr(const QString& sExpr, QString& strErr)
+bool doCheckExprIsValid(const QString& sExpr, QString& strErr)
 {
+	bool isMatch = false;
 	GEPParser gepParser = gepEngine().createParser();
-	QScopedPointer<GCPPMatchQueryVarValue> matchValue(new GCPPMatchQueryVarValue);
-	gepParser.setOnQueryVarValue(matchValue.data());
-	try
 	{
-		gepParser.setExpression(sExpr, matchValue.data());
-	}
-	catch (GLDException e)
-	{
-		strErr = e.message();
-		if (strErr.isEmpty())
+		QScopedPointer<GCPPMatchQueryVarValue> matchValue(new GCPPMatchQueryVarValue(0));
+		gepParser.setOnQueryVarValue(matchValue.data());
+		try
 		{
-			strErr = "err Expr";
+			gepParser.setExpression(sExpr, matchValue.data());
+			gepParser.evaluate();
+			isMatch = gepParser.result().asBoolean();
 		}
-		return false;
+		catch (GLDException e)
+		{
+			strErr = e.message();
+			if (strErr.isEmpty())
+			{
+				strErr = "err Expr";
+			}
+			return false;
+		}
 	}
 	return true;
+}
+
+bool doCheckExprIsMatch(const QString& sExpr, QString& strErr)
+{
+	if (sExpr.isEmpty())
+	{
+		return true;
+	}
+
+	bool isMatch = false;
+	GEPParser gepParser = gepEngine().createParser();
+	{
+		QScopedPointer<GCPPMatchQueryVarValue> matchValue(new GCPPMatchQueryVarValue(0));//内外墙墙标记为0
+		gepParser.setOnQueryVarValue(matchValue.data());
+		try
+		{
+			gepParser.setExpression(sExpr, matchValue.data());
+			gepParser.evaluate();
+			isMatch = gepParser.result().asBoolean();
+		}
+		catch (GLDException e)
+		{
+			strErr = e.message();
+			return false;
+		}
+	}
+	if (isMatch)
+	{
+		return true;
+	}
+	if (sExpr.contains(gpfnInnerOuterFlag))
+	{
+		QScopedPointer<GCPPMatchQueryVarValue> matchValue(new GCPPMatchQueryVarValue(1));//内外墙墙标记为1
+		gepParser.setOnQueryVarValue(matchValue.data());
+
+		gepParser.setExpression(sExpr, matchValue.data());
+		gepParser.evaluate();
+		isMatch = gepParser.result().asBoolean();
+	}
+	return isMatch;
 }

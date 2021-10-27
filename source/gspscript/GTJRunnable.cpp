@@ -244,11 +244,11 @@ bool addTypeMatchExpr(GSPDatabase m_pDb, int nQtyID) // 临时函数
 		GSPRecord dbrecord = ipView.records(k);
 		QString strMatchExpr = dbrecord.asString(pfnMatchExpr);
 		QString strErr;
-		if (!doCheckExpr(strMatchExpr, strErr))
+		if (doCheckExprIsMatch(strMatchExpr, strErr))
 		{
-			return false;
+			return true;
 		}
-
+#if 0
 		strMatchExpr.replace(emptyRe, "");
 		if (strMatchExpr.isEmpty())
 		{
@@ -270,6 +270,7 @@ bool addTypeMatchExpr(GSPDatabase m_pDb, int nQtyID) // 临时函数
 		{
 			return true;
 		}
+#endif
 	}
 	return false;
 }
@@ -297,11 +298,11 @@ void getQtyID(GSPDatabase pBusinessDb, GSPDatabase pBQCalcRuleDb, GSPDatabase pN
 			int nQtyID = dbrecord.asInteger(pfnQtyID);
 			if (!addTypeMatchExpr(pBQCalcRuleDb, nQtyID))
 			{
-				qDebug() << dbpath << QStringLiteral("    清单    ：   %1    匹配表达式缺少Material=31801或Type=252").arg(strDesc);
+				qDebug() << QStringLiteral("%1    清单   Description=%2    QtyID=%3").arg(dbpath).arg(strDesc).arg(nQtyID);
 			}
 			if (!addTypeMatchExpr(pNormCalcRuleDb, nQtyID))
 			{
-				qDebug() << dbpath << QStringLiteral("    定额    ：   %1    匹配表达式缺少Material=31801或Type=252").arg(strDesc);
+				qDebug() << QStringLiteral("%1    定额   Description=%2    QtyID=%3").arg(dbpath).arg(strDesc).arg(nQtyID);
 			}
 		}
 	}
@@ -333,7 +334,7 @@ void walk(const QString& absolute_path, QStringList& list)
 
 void modifyMultiGSP()
 {
-	QString strFilesDir = QStringLiteral("E:/成长同步完的库");//!!!规则库目录
+	QString strFilesDir = QStringLiteral("F:/成长同步完的库");//!!!规则库目录
 	QStringList filelist;
 	walk(strFilesDir, filelist);
 	int maximum = filelist.count();
