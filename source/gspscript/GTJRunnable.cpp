@@ -5,8 +5,6 @@
 // 定义全局变量，用于发生异常时定位文件
 QString g_strGSPFile = QString();
 
-QList<Options> modifySingleGSP(bool bDirectModify);
-
 
 void handleGIPFile(const QString& sExtractFile, const QList<Options>& lstOption)
 {
@@ -224,8 +222,8 @@ QList<Options> modifySingleGSP(bool bSingleGSP) // 默认为true
 	return lstOption;
 }
 
-const QRegExp emptyRe("\\s+");//匹配任意空白字符的正则，弄一个全局变量，而不是局部变量，提高字符串替换效率
-bool addTypeMatchExpr(GSPDatabase m_pDb, int nQtyID) // 临时函数
+const QRegExp blankRe("\\s+");//匹配任意空白字符的正则，弄一个全局变量，而不是局部变量，提高字符串替换效率
+bool dealQtyMatchExpr(GSPDatabase m_pDb, int nQtyID)
 {
 	GSPTable dbtable;
 	dbtable = m_pDb.findTable(ptnQtyCalcRule);
@@ -249,7 +247,7 @@ bool addTypeMatchExpr(GSPDatabase m_pDb, int nQtyID) // 临时函数
 			return true;
 		}
 #if 0
-		strMatchExpr.replace(emptyRe, "");
+		strMatchExpr.replace(blankRe, "");
 		if (strMatchExpr.isEmpty())
 		{
 			return true;
@@ -297,11 +295,11 @@ void getQtyID(GSPDatabase pBusinessDb, GSPDatabase pBQCalcRuleDb,
 		if (strDesc == strMJ || strDesc == strTJ || strDesc == strMBMJ || strDesc.contains(strGSWP))
 		{
 			int nQtyID = dbrecord.asInteger(pfnQtyID);
-			if (!addTypeMatchExpr(pBQCalcRuleDb, nQtyID))
+			if (!dealQtyMatchExpr(pBQCalcRuleDb, nQtyID))
 			{
 				qDebug() << QStringLiteral("%1    清单   Description=%2    QtyID=%3").arg(dbpath).arg(strDesc).arg(nQtyID);
 			}
-			if (!addTypeMatchExpr(pNormCalcRuleDb, nQtyID))
+			if (!dealQtyMatchExpr(pNormCalcRuleDb, nQtyID))
 			{
 				qDebug() << QStringLiteral("%1    定额   Description=%2    QtyID=%3").arg(dbpath).arg(strDesc).arg(nQtyID);
 			}
@@ -309,7 +307,7 @@ void getQtyID(GSPDatabase pBusinessDb, GSPDatabase pBQCalcRuleDb,
 	}
 }
 
-void addGSPCalcRuleTmp(const QString& dbpath)
+void addGSPCalcRuleQty(const QString& dbpath)
 {
 	GSPModel ipGSPModel = gspEngine().createModel();
 	GSPModelPersistent(ipGSPModel).loadFromFile(dbpath);
@@ -339,7 +337,7 @@ void modifyMultiGSP()
 	for (int i = 0; i < maximum; ++i)
 	{
 		QString path = filelist.at(i);
-		addGSPCalcRuleTmp(path);
+		addGSPCalcRuleQty(path);
 		//printf("\r现在正处理第[%d]个文件", i + 1);// \r回到本行的开头，刷新进度
 	}
 	printf("\n");
