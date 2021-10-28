@@ -47,6 +47,7 @@ set_target_properties(${LIBRARY_TARGET_NAME} PROPERTIES LINK_FLAGS "/SAFESEH:NO 
 set_target_properties(${LIBRARY_TARGET_NAME} PROPERTIES AUTOMOC ON)
 
 ##设置预处理器定义
+## _UNICODE宏是因为libxl.h判断如果定义了_UNICODE宏，会使用wchar_t;否则使用char。使用char会导致中文乱码
 target_compile_definitions(${LIBRARY_TARGET_NAME} PRIVATE UNICODE _UNICODE WIN32 QT_DLL QT_NO_DEBUG NDEBUG QT_CORE_LIB) #  QT_GUI_LIB QT_WIDGETS_LIB
 
 ##配置构建/使用时的头文件路径
@@ -60,13 +61,13 @@ target_include_directories(
 find_package(Qt5 COMPONENTS Core REQUIRED)
 find_package(GBIM COMPONENTS Common REQUIRED)
 find_package(GDB COMPONENTS GGDB REQUIRED)
-find_package(GLDRS COMPONENTS GSP VMProtect GSPKeyLib REQUIRED)
+find_package(GLDRS COMPONENTS GSP VMProtect GSPKeyLib libxl REQUIRED)
 find_package(GMP COMPONENTS GMCommon REQUIRED)
 
 target_link_libraries(${LIBRARY_TARGET_NAME}
     PRIVATE Qt5::Core
 	PRIVATE GBIM::Common
 	PRIVATE GDB::GGDB
-	PRIVATE GLDRS::GSP GLDRS::VMProtect GLDRS::GSPKeyLib
+	PRIVATE GLDRS::GSP GLDRS::VMProtect GLDRS::GSPKeyLib GLDRS::libxl
 	PRIVATE GMP::GMCommon
 )

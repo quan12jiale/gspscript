@@ -279,7 +279,8 @@ const QString strMJ = QStringLiteral("面积");
 const QString strTJ = QStringLiteral("体积");
 const QString strMBMJ = QStringLiteral("模板面积");
 const QString strGSWP = QStringLiteral("钢丝网片");
-void getQtyID(GSPDatabase pBusinessDb, GSPDatabase pBQCalcRuleDb, GSPDatabase pNormCalcRuleDb, const QString& dbpath) // 临时函数
+void getQtyID(GSPDatabase pBusinessDb, GSPDatabase pBQCalcRuleDb, 
+	GSPDatabase pNormCalcRuleDb, const QString& dbpath)
 {
 	GSPTable dbtable;
 	dbtable = pBusinessDb.findTable(ptnQtyDict);
@@ -308,7 +309,7 @@ void getQtyID(GSPDatabase pBusinessDb, GSPDatabase pBQCalcRuleDb, GSPDatabase pN
 	}
 }
 
-void addGSPCalcRuleTmp(const QString& dbpath) // 临时函数
+void addGSPCalcRuleTmp(const QString& dbpath)
 {
 	GSPModel ipGSPModel = gspEngine().createModel();
 	GSPModelPersistent(ipGSPModel).loadFromFile(dbpath);
@@ -324,26 +325,22 @@ void addGSPCalcRuleTmp(const QString& dbpath) // 临时函数
 	getQtyID(pBusinessDb, pBQCalcRuleDb, pNormCalcRuleDb, dbpath);
 }
 
-void walk(const QString& absolute_path, QStringList& list)
-{
-	QDirIterator it(absolute_path, QStringList() << "RegionRule_Calc.GSP", QDir::Files, QDirIterator::Subdirectories);
-	while (it.hasNext()) {
-		list.append(it.next());
-	}
-}
-
 void modifyMultiGSP()
 {
-	QString strFilesDir = QStringLiteral("F:/成长同步完的库");//!!!规则库目录
+	//!!!规则库目录
+	QDirIterator it(QStringLiteral("F:/成长同步完的库"), QStringList() << "RegionRule_Calc.GSP",
+		QDir::Files, QDirIterator::Subdirectories);
 	QStringList filelist;
-	walk(strFilesDir, filelist);
+	while (it.hasNext()) {
+		filelist.append(it.next());
+	}
 	int maximum = filelist.count();
-	qDebug() << QStringLiteral("总共有[%1]个文件").arg(maximum);
+	printf("规则库总共有[%d]个文件\n", maximum);
 	for (int i = 0; i < maximum; ++i)
 	{
 		QString path = filelist.at(i);
 		addGSPCalcRuleTmp(path);
-		//printf("\r正在处理第[%d]个文件", i + 1);// \r回到本行的开头，刷新进度
+		//printf("\r现在正处理第[%d]个文件", i + 1);// \r回到本行的开头，刷新进度
 	}
 	printf("\n");
 }

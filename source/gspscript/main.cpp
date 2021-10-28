@@ -1,5 +1,6 @@
 ﻿#include "GTJRunnable.h"
 #include "GCPPMatchQueryVarValue.h"
+#include "libxlUtils.h"
 
 void setExtProp(GSPFieldSchema oField, const QString& strExtPropCode, const QString& strExtPropValue)
 {
@@ -641,15 +642,18 @@ int main(int argc, char *argv[])
 #else
 	//modifySingleGSP(true);
 
-	const QString dbpath = "C:\\Users\\quanjl\\Desktop\\RegionRule_Calc.GSP";
+//	const QString dbpath = "C:\\Users\\quanjl\\Desktop\\RegionRule_Calc.GSP";
 // 	addGSPBusiness(dbpath);
 // 	addGSPCalcRule(dbpath);
 // 	addCalcSettingField(dbpath);
-	modifyMultiGSP();
+	//modifyMultiGSP();
 
-// 	QString sExpr = "((Material = 8) or (Material = 9) or (Material = 10) or (Material = 11)))";
-// 	QString strErr;
-// 	doCheckExprIsValid(sExpr, strErr);
+	//getInternalQtyCodeSet();
+
+	std::wstring strExcelFilePath = L"C:/Users/quanjl/Desktop/墙中间量.xlsx";
+	LibxlUtils* pLibxl = new LibxlUtils;
+	pLibxl->exportToExcel(strExcelFilePath);
+	delete pLibxl;
 
 	qDebug() << QStringLiteral("用时 %1 s").arg(oTime.elapsed() / 1000);
 	system("pause");
