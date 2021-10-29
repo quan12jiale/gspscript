@@ -40,7 +40,7 @@ void LibxlUtils::exportToExcel(const std::wstring& strExcelFilePath)
 	m_nCurNormSheetRowPos++;
 
 	//!!!规则库目录
-	QDirIterator it(QStringLiteral("F:/成长同步完的库"), QStringList() << "RegionRule_Calc.GSP",
+	QDirIterator it(QStringLiteral("F:/11个库"), QStringList() << "RegionRule_Calc.GSP",
 		QDir::Files, QDirIterator::Subdirectories);
 	QStringList filelist;
 	while (it.hasNext()) {
@@ -93,7 +93,7 @@ QSet<QString> getInternalQtyCodeSet()
 		libxl::Book* m_pBook = xlCreateXMLBook();
 		m_pBook->load(L"C:/Users/quanjl/Desktop/墙做主体，涉及轻质隔墙的中间量.xlsx");
 		libxl::Sheet* pBQSheet = m_pBook->getSheet(c_nBQSheet);
-		for (int row = 1; row < 209; row++)
+		for (int row = 1; row < 208; row++)
 		{
 			QString str = QString::fromWCharArray(pBQSheet->readStr(row, 3));
 			oInternalQtyCodeList.append(str);
