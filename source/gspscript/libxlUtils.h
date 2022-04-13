@@ -15,6 +15,7 @@ private:
 	void getInternalQtyID(GSPDatabase pBusinessDb, GSPDatabase pBQCalcRuleDb, GSPDatabase pNormCalcRuleDb,
 		const QString& dbpath, bool bAsSubject);
 	void addGSPCalcRuleInternalQty(const QString& dbpath);
+	void dealQMJ_IsBQ(const QString& dbpath, GSPDatabase pBusinessDb, GSPDatabase pBQCalcRuleDb, GSPDatabase pNormCalcRuleDb, bool isBQ, bool isMJ);
 private:
 	libxl::Book* m_pBook;
 	int m_nCurBQSheetRowPos;

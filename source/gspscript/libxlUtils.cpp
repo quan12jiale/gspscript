@@ -26,21 +26,41 @@ void LibxlUtils::exportToExcel(const std::wstring& strExcelFilePath)
 	libxl::Sheet* pNormSheet = m_pBook->addSheet(c_sNormSheet);
 
 	// 调整列宽
-	pBQSheet->setCol(0, 0, 100);
-	pBQSheet->setCol(1, 1, 30);
-	pNormSheet->setCol(0, 0, 100);
-	pNormSheet->setCol(1, 1, 30);
+	pBQSheet->setCol(0, 0, 40);
+	pBQSheet->setCol(1, 1, 150);
+	pBQSheet->setCol(2, 2, 50);
+	pBQSheet->setCol(3, 3, 20);
 
-	pBQSheet->writeStr(m_nCurBQSheetRowPos, 0, L"Description");
-	pBQSheet->writeStr(m_nCurBQSheetRowPos, 1, L"InternalQtyID");
+	pNormSheet->setCol(0, 0, 40);
+	pNormSheet->setCol(1, 1, 150);
+	pNormSheet->setCol(2, 2, 50);
+	pNormSheet->setCol(3, 3, 20);
+
+	QString sDescription = QStringLiteral("描述代码");
+	QString sSubjectMatchExpr = QStringLiteral("主体匹配表达式");
+	QString sObjectMatchExpr = QStringLiteral("客体匹配表达式");
+	QString sCalcRuleDescription = QStringLiteral("中间量规则选项描述");
+
+	pBQSheet->writeStr(m_nCurBQSheetRowPos, 0, sDescription.toStdWString().c_str());
+	pBQSheet->writeStr(m_nCurBQSheetRowPos, 1, sSubjectMatchExpr.toStdWString().c_str());
+	pBQSheet->writeStr(m_nCurBQSheetRowPos, 2, sObjectMatchExpr.toStdWString().c_str());
+	pBQSheet->writeStr(m_nCurBQSheetRowPos, 3, sCalcRuleDescription.toStdWString().c_str());
+	m_nCurBQSheetRowPos++;
 	m_nCurBQSheetRowPos++;
 
-	pNormSheet->writeStr(m_nCurNormSheetRowPos, 0, L"Description");
-	pNormSheet->writeStr(m_nCurNormSheetRowPos, 1, L"InternalQtyID");
+	pNormSheet->writeStr(m_nCurNormSheetRowPos, 0, sDescription.toStdWString().c_str());
+	pNormSheet->writeStr(m_nCurNormSheetRowPos, 1, sSubjectMatchExpr.toStdWString().c_str());
+	pNormSheet->writeStr(m_nCurNormSheetRowPos, 2, sObjectMatchExpr.toStdWString().c_str());
+	pNormSheet->writeStr(m_nCurNormSheetRowPos, 3, sCalcRuleDescription.toStdWString().c_str());
+	m_nCurNormSheetRowPos++;
 	m_nCurNormSheetRowPos++;
 
+// 	pNormSheet->writeStr(m_nCurNormSheetRowPos, 0, L"Description");
+// 	pNormSheet->writeStr(m_nCurNormSheetRowPos, 1, L"InternalQtyID");
+// 	m_nCurNormSheetRowPos++;
+
 	//!!!规则库目录
-	QDirIterator it(QStringLiteral("F:/11个库"), QStringList() << "RegionRule_Calc.GSP",
+	QDirIterator it(QStringLiteral("E:/gtjcalcrule/2021新清单-修改-含21新清单"), QStringList() << "RegionRule_Calc.GSP",
 		QDir::Files, QDirIterator::Subdirectories);
 	QStringList filelist;
 	while (it.hasNext()) {
@@ -48,7 +68,7 @@ void LibxlUtils::exportToExcel(const std::wstring& strExcelFilePath)
 	}
 	int maximum = filelist.count();
 	printf("规则库总共有[%d]个文件\n", maximum);
-	for (int i = 0; i < maximum; ++i)
+	for (int i = 0; i < maximum; ++i) // maximum
 	{
 		QString path = filelist.at(i);
 		addGSPCalcRuleInternalQty(path);
@@ -170,15 +190,99 @@ void LibxlUtils::getInternalQtyID(GSPDatabase pBusinessDb, GSPDatabase pBQCalcRu
 	}
 }
 
+void LibxlUtils::dealQMJ_IsBQ(const QString& dbpath, GSPDatabase pBusinessDb, GSPDatabase pBQCalcRuleDb, GSPDatabase pNormCalcRuleDb, bool isBQ, bool isMJ)
+{
+	int& nCurBQSheetRowPos = isBQ ? m_nCurBQSheetRowPos : m_nCurNormSheetRowPos;
+	libxl::Sheet* pBQSheet = m_pBook->getSheet(isBQ ? c_nBQSheet : c_nNormSheet);
+	QString tempExpr = QStringLiteral("%1")
+		//.arg(isBQ ? QStringLiteral("清单") : QStringLiteral("定额"))
+		.arg(isMJ ? QStringLiteral("面积") : QStringLiteral("体积"));
+	pBQSheet->writeStr(nCurBQSheetRowPos, 0, tempExpr.toStdWString().c_str());
+	pBQSheet->setMerge(nCurBQSheetRowPos, nCurBQSheetRowPos, 0, 3);
+	nCurBQSheetRowPos++;
+
+	GSPTable pInternalQtyCalcRuleItemDictTable = pBusinessDb.findTable(ptnInternalQtyCalcRuleItemDict);
+
+	GSPTable pInternalQtyDictTable = pBusinessDb.findTable(ptnInternalQtyDict);
+	QString expr = isMJ ? QStringLiteral("(Description='扣墙面积') and (SubjectElementTypeID=0)") : QStringLiteral("(Description='扣墙体积') and (SubjectElementTypeID=0)");
+	GSPView ipView = pInternalQtyDictTable.createStaticView(expr);
+	int nAddrCnt = ipView.recordCount();
+	if (nAddrCnt != 1)
+	{
+		return;
+	}
+
+	GSPRecord dbrecord = ipView.records(0);
+	int nInternalQtyID = dbrecord.asInteger(pfnInternalQtyID);
+
+	GSPTable pInternalQtyCalcRuleTable = isBQ ? pBQCalcRuleDb.findTable(ptnInternalQtyCalcRule) : pNormCalcRuleDb.findTable(ptnInternalQtyCalcRule);
+	expr = QString("InternalQtyID=%1").arg(nInternalQtyID);
+	ipView = pInternalQtyCalcRuleTable.createStaticView(expr);
+	nAddrCnt = ipView.recordCount();
+	for (int i = 0; i < nAddrCnt; i++)
+	{
+		GSPRecord dbrecord = ipView.records(i);
+		QString sDescription = dbrecord.asString(pfnDescription);
+		QString sSubjectMatchExpr = dbrecord.asString(pfnSubjectMatchExpr);
+		QString sObjectMatchExpr = dbrecord.asString(pfnObjectMatchExpr);
+		int nCalcRuleID = dbrecord.asInteger(pfnCalcRuleID);
+
+		QString sCalcRuleDescription;
+		SCOPE_EXIT
+		{
+			pBQSheet->writeStr(nCurBQSheetRowPos, 0, sDescription.toStdWString().c_str());
+		pBQSheet->writeStr(nCurBQSheetRowPos, 1, sSubjectMatchExpr.toStdWString().c_str());
+		pBQSheet->writeStr(nCurBQSheetRowPos, 2, sObjectMatchExpr.toStdWString().c_str());
+		pBQSheet->writeStr(nCurBQSheetRowPos, 3, sCalcRuleDescription.toStdWString().c_str());
+		nCurBQSheetRowPos++;
+		};
+		if (nCalcRuleID == 0)
+		{
+			sCalcRuleDescription = QStringLiteral("0  无影响");
+
+			continue;
+		}
+
+		QString innerExpr = QString("ID=%1").arg(nCalcRuleID);
+		GSPView innerView = pInternalQtyCalcRuleItemDictTable.createStaticView(innerExpr);
+		int innerAddrCnt = innerView.recordCount();
+		if (innerAddrCnt != 1)
+		{
+			continue;
+		}
+		GSPRecord innerrecord = innerView.records(0);
+		sCalcRuleDescription = innerrecord.asString(pfnDescription);
+	}
+
+	nCurBQSheetRowPos++;
+}
+
 void LibxlUtils::addGSPCalcRuleInternalQty(const QString& dbpath)
 {
 	GSPModel ipGSPModel = gspEngine().createModel();
 	GSPModelPersistent(ipGSPModel).loadFromFile(dbpath);
 	ipGSPModel.setMode(gmRuntime);
 
+	QString tempExpr = dbpath.section('/', 3);
+
+	libxl::Sheet* pBQSheet = m_pBook->getSheet(c_nBQSheet);
+	pBQSheet->writeStr(m_nCurBQSheetRowPos, 0, tempExpr.toStdWString().c_str());
+	pBQSheet->setMerge(m_nCurBQSheetRowPos, m_nCurBQSheetRowPos, 0, 3);
+	m_nCurBQSheetRowPos++;
+
+	libxl::Sheet* pNormSheet = m_pBook->getSheet(c_nNormSheet);
+	pNormSheet->writeStr(m_nCurNormSheetRowPos, 0, tempExpr.toStdWString().c_str());
+	pNormSheet->setMerge(m_nCurNormSheetRowPos, m_nCurNormSheetRowPos, 0, 3);
+	m_nCurNormSheetRowPos++;
+
 	GSPDatabase pBusinessDb = ipGSPModel.find(pdnBusiness);
 	GSPDatabase pBQCalcRuleDb = ipGSPModel.find(pdnBQCalcRule);
 	GSPDatabase pNormCalcRuleDb = ipGSPModel.find(pdnNormCalcRule);
-	getInternalQtyID(pBusinessDb, pBQCalcRuleDb, pNormCalcRuleDb, dbpath, true);
+
+	dealQMJ_IsBQ(dbpath, pBusinessDb, pBQCalcRuleDb, pNormCalcRuleDb, true, true);
+	dealQMJ_IsBQ(dbpath, pBusinessDb, pBQCalcRuleDb, pNormCalcRuleDb, false, true);
+
+	dealQMJ_IsBQ(dbpath, pBusinessDb, pBQCalcRuleDb, pNormCalcRuleDb, true, false);
+	dealQMJ_IsBQ(dbpath, pBusinessDb, pBQCalcRuleDb, pNormCalcRuleDb, false, false);
 }
 
