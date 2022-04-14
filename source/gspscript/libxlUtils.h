@@ -16,10 +16,14 @@ private:
 		const QString& dbpath, bool bAsSubject);
 	void addGSPCalcRuleInternalQty(const QString& dbpath);
 	void dealQMJ_IsBQ(const QString& dbpath, GSPDatabase pBusinessDb, GSPDatabase pBQCalcRuleDb, GSPDatabase pNormCalcRuleDb, bool isBQ, bool isMJ);
+
+	void dealDanDanQMJ_IsBQ(GSPDatabase pBusinessDb, GSPDatabase pBQCalcRuleDb, GSPDatabase pNormCalcRuleDb, bool isBQ);
 private:
 	libxl::Book* m_pBook;
 	int m_nCurBQSheetRowPos;
 	int m_nCurNormSheetRowPos;
+	libxl::Format* m_pGreenFormat;
+	libxl::Format* m_pRedFormat;
 };
 
 QSet<QString> getInternalQtyCodeSet();

@@ -13,6 +13,38 @@ LibxlUtils::LibxlUtils()
 	m_pBook->setKey(L"TommoT", L"windows-2421220b07c2e10a6eb96768a2p7r6gc");
 	m_nCurBQSheetRowPos = 0;
 	m_nCurNormSheetRowPos = 0;
+
+	// 序号、构件类型、报表量、编码、清单定额类别 绿色显示
+	libxl::Font* pGreenFont = m_pBook->addFont();
+	pGreenFont->setBold(true);
+
+	m_pGreenFormat = m_pBook->addFormat();
+	m_pGreenFormat->setFont(pGreenFont);
+	m_pGreenFormat->setBorderTop();
+	m_pGreenFormat->setBorderLeft();
+	m_pGreenFormat->setBorderBottom();
+	m_pGreenFormat->setBorderRight();
+	m_pGreenFormat->setAlignH(libxl::ALIGNH_CENTER);
+	m_pGreenFormat->setAlignV(libxl::ALIGNV_CENTER);
+	m_pGreenFormat->setFillPattern(libxl::FILLPATTERN_SOLID);
+	m_pGreenFormat->setPatternForegroundColor(libxl::COLOR_LIGHTGREEN);
+
+
+	// 红色字体
+	libxl::Font *pRedFont = m_pBook->addFont();
+	pRedFont->setColor(libxl::COLOR_RED);
+
+	m_pRedFormat = m_pBook->addFormat();
+	m_pRedFormat->setBorderTop();
+	m_pRedFormat->setBorderLeft();
+	m_pRedFormat->setBorderBottom();
+	m_pRedFormat->setBorderRight();
+	m_pRedFormat->setAlignH(libxl::ALIGNH_CENTER);
+	m_pRedFormat->setAlignV(libxl::ALIGNV_CENTER);
+	m_pRedFormat->setFillPattern(libxl::FILLPATTERN_SOLID);
+	m_pRedFormat->setPatternForegroundColor(libxl::COLOR_WHITE);
+	m_pRedFormat->setFont(pRedFont);
+	m_pRedFormat->setWrap(true);
 }
 
 LibxlUtils::~LibxlUtils()
@@ -36,24 +68,24 @@ void LibxlUtils::exportToExcel(const std::wstring& strExcelFilePath)
 	pNormSheet->setCol(2, 2, 50);
 	pNormSheet->setCol(3, 3, 20);
 
-	QString sDescription = QStringLiteral("描述代码");
-	QString sSubjectMatchExpr = QStringLiteral("主体匹配表达式");
-	QString sObjectMatchExpr = QStringLiteral("客体匹配表达式");
-	QString sCalcRuleDescription = QStringLiteral("中间量规则选项描述");
-
-	pBQSheet->writeStr(m_nCurBQSheetRowPos, 0, sDescription.toStdWString().c_str());
-	pBQSheet->writeStr(m_nCurBQSheetRowPos, 1, sSubjectMatchExpr.toStdWString().c_str());
-	pBQSheet->writeStr(m_nCurBQSheetRowPos, 2, sObjectMatchExpr.toStdWString().c_str());
-	pBQSheet->writeStr(m_nCurBQSheetRowPos, 3, sCalcRuleDescription.toStdWString().c_str());
-	m_nCurBQSheetRowPos++;
-	m_nCurBQSheetRowPos++;
-
-	pNormSheet->writeStr(m_nCurNormSheetRowPos, 0, sDescription.toStdWString().c_str());
-	pNormSheet->writeStr(m_nCurNormSheetRowPos, 1, sSubjectMatchExpr.toStdWString().c_str());
-	pNormSheet->writeStr(m_nCurNormSheetRowPos, 2, sObjectMatchExpr.toStdWString().c_str());
-	pNormSheet->writeStr(m_nCurNormSheetRowPos, 3, sCalcRuleDescription.toStdWString().c_str());
-	m_nCurNormSheetRowPos++;
-	m_nCurNormSheetRowPos++;
+// 	QString sDescription = QStringLiteral("描述代码");
+// 	QString sSubjectMatchExpr = QStringLiteral("主体匹配表达式");
+// 	QString sObjectMatchExpr = QStringLiteral("客体匹配表达式");
+// 	QString sCalcRuleDescription = QStringLiteral("中间量规则选项默认值");
+// 
+// 	pBQSheet->writeStr(m_nCurBQSheetRowPos, 0, sDescription.toStdWString().c_str());
+// 	pBQSheet->writeStr(m_nCurBQSheetRowPos, 1, sSubjectMatchExpr.toStdWString().c_str());
+// 	pBQSheet->writeStr(m_nCurBQSheetRowPos, 2, sObjectMatchExpr.toStdWString().c_str());
+// 	pBQSheet->writeStr(m_nCurBQSheetRowPos, 3, sCalcRuleDescription.toStdWString().c_str());
+// 	m_nCurBQSheetRowPos++;
+// 	m_nCurBQSheetRowPos++;
+// 
+// 	pNormSheet->writeStr(m_nCurNormSheetRowPos, 0, sDescription.toStdWString().c_str());
+// 	pNormSheet->writeStr(m_nCurNormSheetRowPos, 1, sSubjectMatchExpr.toStdWString().c_str());
+// 	pNormSheet->writeStr(m_nCurNormSheetRowPos, 2, sObjectMatchExpr.toStdWString().c_str());
+// 	pNormSheet->writeStr(m_nCurNormSheetRowPos, 3, sCalcRuleDescription.toStdWString().c_str());
+// 	m_nCurNormSheetRowPos++;
+// 	m_nCurNormSheetRowPos++;
 
 // 	pNormSheet->writeStr(m_nCurNormSheetRowPos, 0, L"Description");
 // 	pNormSheet->writeStr(m_nCurNormSheetRowPos, 1, L"InternalQtyID");
@@ -121,6 +153,57 @@ QSet<QString> getInternalQtyCodeSet()
 		oInternalQtyCodeSet = oInternalQtyCodeList.toSet();
 
 		delete m_pBook;
+	}
+	return oInternalQtyCodeSet;
+}
+
+QStringList getMJInternalQtyCodeSet()
+{
+	static QStringList oInternalQtyCodeSet;
+	if (oInternalQtyCodeSet.isEmpty())
+	{
+		oInternalQtyCodeSet << "YSMJ"
+			<< "KMMJ"
+			<< "KCMJ"
+			<< "KMLCMJ"
+			<< "KDMJ"
+			<< "KDXCMJ"
+			<< "KDXDMJ"
+			<< "JQDMJ"
+			<< "KBKMJ"
+			<< "KTGLMJ"
+			<< "KFTGLMJ"
+			<< "KQLMJ"
+			<< "KQMJ"
+			<< "KYZQHJMJ"
+			<< "KYZQMJ"
+			<< "KBWQMJ"
+			<< "KLMJ"
+			<< "KYZLMJ"
+			<< "KLLMJ"
+			<< "KXJBMJ"
+			<< "KYZBMJ"
+			<< "KLXBMJ"
+			<< "KPDMJ"
+			<< "KYDMJ"
+			<< "KTDCMJ"
+			<< "KFTDCMJ"
+			<< "KJCLMJ"
+			<< "KTZDMJ"
+			<< "KFTZDMJ"
+			<< "KGZZMJ"
+			<< "KZMJ"
+			<< "KZYZMJ"
+			<< "KTTJMJ"
+			<< "KFTTJMJ"
+			<< "KTDJMJ"
+			<< "KFTDJMJ"
+			<< "KFBJCMJ"
+			<< "KZCTMJ"
+			<< "KDGMJ"
+			<< "KZMMJ"
+			<< "KMQMJ"
+			<< "KLBMJ";
 	}
 	return oInternalQtyCodeSet;
 }
@@ -257,6 +340,100 @@ void LibxlUtils::dealQMJ_IsBQ(const QString& dbpath, GSPDatabase pBusinessDb, GS
 	nCurBQSheetRowPos++;
 }
 
+void LibxlUtils::dealDanDanQMJ_IsBQ(GSPDatabase pBusinessDb, GSPDatabase pBQCalcRuleDb, GSPDatabase pNormCalcRuleDb, bool isBQ)
+{
+	int& nCurBQSheetRowPos = isBQ ? m_nCurBQSheetRowPos : m_nCurNormSheetRowPos;
+	libxl::Sheet* pBQSheet = m_pBook->getSheet(isBQ ? c_nBQSheet : c_nNormSheet);
+
+	GSPTable pInternalQtyDictTable = pBusinessDb.findTable(ptnInternalQtyDict);
+
+	GSPTable pInternalQtyCalcRuleTable = isBQ ? pBQCalcRuleDb.findTable(ptnInternalQtyCalcRule) : pNormCalcRuleDb.findTable(ptnInternalQtyCalcRule);
+
+	GSPTable pInternalQtyCalcRuleItemDictTable = pBusinessDb.findTable(ptnInternalQtyCalcRuleItemDict);
+
+	QStringList oInternalQtyCodeSet = getMJInternalQtyCodeSet();
+	for (QString sInternalQtyCode : oInternalQtyCodeSet)
+	{
+		QString expr = QString("(Code='%1') and (SubjectElementTypeID=0)").arg(sInternalQtyCode);
+		GSPView ipView = pInternalQtyDictTable.createStaticView(expr);
+		int nAddrCnt = ipView.recordCount();
+
+		{
+			QString tempExpr = QStringLiteral("中间量代码");
+			pBQSheet->writeStr(nCurBQSheetRowPos, 0, tempExpr.toStdWString().c_str(), m_pGreenFormat);
+			tempExpr = QStringLiteral("中间量名称");
+			pBQSheet->writeStr(nCurBQSheetRowPos, 1, tempExpr.toStdWString().c_str(), m_pGreenFormat);
+			nCurBQSheetRowPos++;
+
+		};
+
+		QString sInternalQtyDesc;
+		if (nAddrCnt != 1)
+		{
+			continue;
+		}
+
+		GSPRecord dbrecord = ipView.records(0);
+		int nInternalQtyID = dbrecord.asInteger(pfnInternalQtyID);
+		sInternalQtyDesc = dbrecord.asString(pfnDescription);
+
+		pBQSheet->writeStr(nCurBQSheetRowPos, 0, sInternalQtyCode.toStdWString().c_str());
+		pBQSheet->writeStr(nCurBQSheetRowPos, 1, sInternalQtyDesc.toStdWString().c_str());
+		nCurBQSheetRowPos++;
+
+		QString tempExpr = QStringLiteral("描述");
+		pBQSheet->writeStr(nCurBQSheetRowPos, 0, tempExpr.toStdWString().c_str(), m_pGreenFormat);
+		tempExpr = QStringLiteral("主体匹配表达式");
+		pBQSheet->writeStr(nCurBQSheetRowPos, 1, tempExpr.toStdWString().c_str(), m_pGreenFormat);
+		tempExpr = QStringLiteral("客体匹配表达式");
+		pBQSheet->writeStr(nCurBQSheetRowPos, 2, tempExpr.toStdWString().c_str(), m_pGreenFormat);
+		tempExpr = QStringLiteral("中间量计算规则选项默认值");
+		pBQSheet->writeStr(nCurBQSheetRowPos, 3, tempExpr.toStdWString().c_str(), m_pGreenFormat);
+		nCurBQSheetRowPos++;
+
+		expr = QString("InternalQtyID=%1").arg(nInternalQtyID);
+		ipView = pInternalQtyCalcRuleTable.createStaticView(expr);
+		nAddrCnt = ipView.recordCount();
+
+		for (int i = 0; i < nAddrCnt; i++)
+		{
+			dbrecord = ipView.records(i);
+			QString sInternalQtyCalcRuleDesc = dbrecord.asString(pfnDescription);
+			QString sSubjectMatchExpr = dbrecord.asString(pfnSubjectMatchExpr);
+			QString sObjectMatchExpr = dbrecord.asString(pfnObjectMatchExpr);
+			int nCalcRuleID = dbrecord.asInteger(pfnDefaultCalcRuleID);
+
+			QString sCalcRuleDescription;
+
+			SCOPE_EXIT
+			{
+			pBQSheet->writeStr(nCurBQSheetRowPos, 0, sInternalQtyCalcRuleDesc.toStdWString().c_str());
+			pBQSheet->writeStr(nCurBQSheetRowPos, 1, sSubjectMatchExpr.toStdWString().c_str());
+			pBQSheet->writeStr(nCurBQSheetRowPos, 2, sObjectMatchExpr.toStdWString().c_str());
+			pBQSheet->writeStr(nCurBQSheetRowPos, 3, sCalcRuleDescription.toStdWString().c_str());
+			nCurBQSheetRowPos++;
+			};
+
+			if (nCalcRuleID == 0)
+			{
+				sCalcRuleDescription = QStringLiteral("0  无影响");
+				continue;
+			}
+
+			QString innerExpr = QString("ID=%1").arg(nCalcRuleID);
+			GSPView innerView = pInternalQtyCalcRuleItemDictTable.createStaticView(innerExpr);
+			int innerAddrCnt = innerView.recordCount();
+			if (innerAddrCnt != 1)
+			{
+				continue;
+			}
+			GSPRecord innerrecord = innerView.records(0);
+			sCalcRuleDescription = innerrecord.asString(pfnDescription);
+		}
+		nCurBQSheetRowPos++;
+	}
+}
+
 void LibxlUtils::addGSPCalcRuleInternalQty(const QString& dbpath)
 {
 	GSPModel ipGSPModel = gspEngine().createModel();
@@ -266,12 +443,12 @@ void LibxlUtils::addGSPCalcRuleInternalQty(const QString& dbpath)
 	QString tempExpr = dbpath.section('/', 3);
 
 	libxl::Sheet* pBQSheet = m_pBook->getSheet(c_nBQSheet);
-	pBQSheet->writeStr(m_nCurBQSheetRowPos, 0, tempExpr.toStdWString().c_str());
+	pBQSheet->writeStr(m_nCurBQSheetRowPos, 0, tempExpr.toStdWString().c_str(), m_pRedFormat);
 	pBQSheet->setMerge(m_nCurBQSheetRowPos, m_nCurBQSheetRowPos, 0, 3);
 	m_nCurBQSheetRowPos++;
 
 	libxl::Sheet* pNormSheet = m_pBook->getSheet(c_nNormSheet);
-	pNormSheet->writeStr(m_nCurNormSheetRowPos, 0, tempExpr.toStdWString().c_str());
+	pNormSheet->writeStr(m_nCurNormSheetRowPos, 0, tempExpr.toStdWString().c_str(), m_pRedFormat);
 	pNormSheet->setMerge(m_nCurNormSheetRowPos, m_nCurNormSheetRowPos, 0, 3);
 	m_nCurNormSheetRowPos++;
 
@@ -279,10 +456,16 @@ void LibxlUtils::addGSPCalcRuleInternalQty(const QString& dbpath)
 	GSPDatabase pBQCalcRuleDb = ipGSPModel.find(pdnBQCalcRule);
 	GSPDatabase pNormCalcRuleDb = ipGSPModel.find(pdnNormCalcRule);
 
-	dealQMJ_IsBQ(dbpath, pBusinessDb, pBQCalcRuleDb, pNormCalcRuleDb, true, true);
-	dealQMJ_IsBQ(dbpath, pBusinessDb, pBQCalcRuleDb, pNormCalcRuleDb, false, true);
+	dealDanDanQMJ_IsBQ(pBusinessDb, pBQCalcRuleDb, pNormCalcRuleDb, true);
+	dealDanDanQMJ_IsBQ(pBusinessDb, pBQCalcRuleDb, pNormCalcRuleDb, false);
 
-	dealQMJ_IsBQ(dbpath, pBusinessDb, pBQCalcRuleDb, pNormCalcRuleDb, true, false);
-	dealQMJ_IsBQ(dbpath, pBusinessDb, pBQCalcRuleDb, pNormCalcRuleDb, false, false);
+	m_nCurBQSheetRowPos++;
+	m_nCurNormSheetRowPos++;
+
+// 	dealQMJ_IsBQ(dbpath, pBusinessDb, pBQCalcRuleDb, pNormCalcRuleDb, true, true);
+// 	dealQMJ_IsBQ(dbpath, pBusinessDb, pBQCalcRuleDb, pNormCalcRuleDb, false, true);
+// 
+// 	dealQMJ_IsBQ(dbpath, pBusinessDb, pBQCalcRuleDb, pNormCalcRuleDb, true, false);
+// 	dealQMJ_IsBQ(dbpath, pBusinessDb, pBQCalcRuleDb, pNormCalcRuleDb, false, false);
 }
 
