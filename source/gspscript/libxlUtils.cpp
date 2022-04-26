@@ -434,6 +434,77 @@ void LibxlUtils::dealDanDanQMJ_IsBQ(GSPDatabase pBusinessDb, GSPDatabase pBQCalc
 	}
 }
 
+bool isInInternalQtyCodeSet(const QStringList& oInternalQtyCodeSet, QString sCalcExpr)
+{
+	for (QString sInternalQtyCode : oInternalQtyCodeSet)
+	{
+		if (sCalcExpr.contains(sInternalQtyCode))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void LibxlUtils::dealDanDanALLQMJQty_IsBQ(GSPDatabase pBusinessDb, GSPDatabase pBQCalcRuleDb, GSPDatabase pNormCalcRuleDb, bool isBQ)
+{
+	int& nCurBQSheetRowPos = isBQ ? m_nCurBQSheetRowPos : m_nCurNormSheetRowPos;
+	libxl::Sheet* pBQSheet = m_pBook->getSheet(isBQ ? c_nBQSheet : c_nNormSheet);
+
+	GSPTable pQtyDictTable = pBusinessDb.findTable(ptnQtyDict);
+
+	GSPTable pQtyCalcRuleTable = isBQ ? pBQCalcRuleDb.findTable(ptnQtyCalcRule) : pNormCalcRuleDb.findTable(ptnQtyCalcRule);
+
+	QStringList oInternalQtyCodeSet = getMJInternalQtyCodeSet();
+
+	QString expr = QString("ElementTypeID=0");
+	GSPView ipView = pQtyDictTable.createStaticView(expr);
+	int nAddrCnt = ipView.recordCount();
+	for (int i = 0; i < nAddrCnt; i++)
+	{
+		int nTempRow = nCurBQSheetRowPos;
+		nCurBQSheetRowPos++;
+		bool isContains = false;
+		
+		GSPRecord dbrecord = ipView.records(i);
+		int nQtyID = dbrecord.asInteger(pfnQtyID);
+
+		expr = QString("QtyID=%1").arg(nQtyID);
+		GSPView ipInnerView = pQtyCalcRuleTable.createStaticView(expr);
+		int nInnerAddrCnt = ipInnerView.recordCount();
+		for (int j = 0; j < nInnerAddrCnt; j++)
+		{
+			dbrecord = ipInnerView.records(j);
+			QString sCalcExpr = dbrecord.asString(pfnCalcExpr);
+			if (isInInternalQtyCodeSet(oInternalQtyCodeSet, sCalcExpr))
+			{
+				QString sQtyDesc = dbrecord.asString(pfnDescription);
+				isContains = true;
+				{
+					pBQSheet->writeStr(nCurBQSheetRowPos, 0, QString::number(nQtyID).toStdWString().c_str());
+					pBQSheet->writeStr(nCurBQSheetRowPos, 1, sQtyDesc.toStdWString().c_str());
+					nCurBQSheetRowPos++;
+				};
+			}
+		}
+
+		if (isContains)
+		{
+			QString tempExpr = QStringLiteral("报表量ID");
+			pBQSheet->writeStr(nTempRow, 0, tempExpr.toStdWString().c_str(), m_pGreenFormat);
+			tempExpr = QStringLiteral("报表量名称");
+			pBQSheet->writeStr(nTempRow, 1, tempExpr.toStdWString().c_str(), m_pGreenFormat);
+
+			nCurBQSheetRowPos++;
+		}
+		else
+		{
+			nCurBQSheetRowPos--;
+		}
+		
+	}
+}
+
 void LibxlUtils::addGSPCalcRuleInternalQty(const QString& dbpath)
 {
 	GSPModel ipGSPModel = gspEngine().createModel();
@@ -444,20 +515,20 @@ void LibxlUtils::addGSPCalcRuleInternalQty(const QString& dbpath)
 
 	libxl::Sheet* pBQSheet = m_pBook->getSheet(c_nBQSheet);
 	pBQSheet->writeStr(m_nCurBQSheetRowPos, 0, tempExpr.toStdWString().c_str(), m_pRedFormat);
-	pBQSheet->setMerge(m_nCurBQSheetRowPos, m_nCurBQSheetRowPos, 0, 3);
+	pBQSheet->setMerge(m_nCurBQSheetRowPos, m_nCurBQSheetRowPos, 0, 1);
 	m_nCurBQSheetRowPos++;
 
 	libxl::Sheet* pNormSheet = m_pBook->getSheet(c_nNormSheet);
 	pNormSheet->writeStr(m_nCurNormSheetRowPos, 0, tempExpr.toStdWString().c_str(), m_pRedFormat);
-	pNormSheet->setMerge(m_nCurNormSheetRowPos, m_nCurNormSheetRowPos, 0, 3);
+	pNormSheet->setMerge(m_nCurNormSheetRowPos, m_nCurNormSheetRowPos, 0, 1);
 	m_nCurNormSheetRowPos++;
 
 	GSPDatabase pBusinessDb = ipGSPModel.find(pdnBusiness);
 	GSPDatabase pBQCalcRuleDb = ipGSPModel.find(pdnBQCalcRule);
 	GSPDatabase pNormCalcRuleDb = ipGSPModel.find(pdnNormCalcRule);
 
-	dealDanDanQMJ_IsBQ(pBusinessDb, pBQCalcRuleDb, pNormCalcRuleDb, true);
-	dealDanDanQMJ_IsBQ(pBusinessDb, pBQCalcRuleDb, pNormCalcRuleDb, false);
+	dealDanDanALLQMJQty_IsBQ(pBusinessDb, pBQCalcRuleDb, pNormCalcRuleDb, true);
+	dealDanDanALLQMJQty_IsBQ(pBusinessDb, pBQCalcRuleDb, pNormCalcRuleDb, false);
 
 	m_nCurBQSheetRowPos++;
 	m_nCurNormSheetRowPos++;
