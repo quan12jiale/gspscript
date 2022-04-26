@@ -59,7 +59,7 @@ void LibxlUtils::exportToExcel(const std::wstring& strExcelFilePath)
 
 	// 调整列宽
 	pBQSheet->setCol(0, 0, 40);
-	pBQSheet->setCol(1, 1, 150);
+	pBQSheet->setCol(1, 1, 50);
 	pBQSheet->setCol(2, 2, 50);
 	pBQSheet->setCol(3, 3, 20);
 
@@ -505,6 +505,62 @@ void LibxlUtils::dealDanDanALLQMJQty_IsBQ(GSPDatabase pBusinessDb, GSPDatabase p
 	}
 }
 
+void LibxlUtils::dealDanDanCalcRuleID_IsBQ(GSPDatabase pBusinessDb, GSPDatabase pBQCalcRuleDb, GSPDatabase pNormCalcRuleDb, bool isBQ)
+{
+	int& nCurBQSheetRowPos = isBQ ? m_nCurBQSheetRowPos : m_nCurNormSheetRowPos;
+	libxl::Sheet* pBQSheet = m_pBook->getSheet(isBQ ? c_nBQSheet : c_nNormSheet);
+
+	GSPTable pInternalQtyDictTable = pBusinessDb.findTable(ptnInternalQtyDict);
+	GSPTable pInternalQtyCalcRuleItemDictTable = pBusinessDb.findTable(ptnInternalQtyCalcRuleItemDict);
+
+	const QStringList oInternalQtyCodeSet = getMJInternalQtyCodeSet();
+	for (QString sInternalQtyCode : oInternalQtyCodeSet)
+	{
+		QString expr = QString("(SubjectElementTypeID=0) and (Code='%1')").arg(sInternalQtyCode);
+		GSPView ipView = pInternalQtyDictTable.createStaticView(expr);
+		int nAddrCnt = ipView.recordCount();
+		if (nAddrCnt < 1)
+		{
+			continue;
+		}
+
+
+		QString tempExpr = QStringLiteral("中间量代码");
+		pBQSheet->writeStr(nCurBQSheetRowPos, 0, tempExpr.toStdWString().c_str(), m_pGreenFormat);
+		tempExpr = QStringLiteral("中间量规则选项ID");
+		pBQSheet->writeStr(nCurBQSheetRowPos, 1, tempExpr.toStdWString().c_str(), m_pGreenFormat);
+		tempExpr = QStringLiteral("选项描述");
+		pBQSheet->writeStr(nCurBQSheetRowPos, 2, tempExpr.toStdWString().c_str(), m_pGreenFormat);
+		tempExpr = QStringLiteral("计算策略名");
+		pBQSheet->writeStr(nCurBQSheetRowPos, 3, tempExpr.toStdWString().c_str(), m_pGreenFormat);
+
+		nCurBQSheetRowPos++;
+
+		GSPRecord dbrecord = ipView.records(0);
+		int nInternalQtyID = dbrecord.asInteger(pfnInternalQtyID);
+
+		expr = QString("InternalQtyID=%1").arg(nInternalQtyID);
+		GSPView ipInnerView = pInternalQtyCalcRuleItemDictTable.createStaticView(expr);
+		int nInnerAddrCnt = ipInnerView.recordCount();
+		for (int i = 0; i < nInnerAddrCnt; i++)
+		{
+			GSPRecord dbInnerrecord = ipInnerView.records(i);
+			int nCalcRuleItemID = dbInnerrecord.asInteger(pfnID);
+			QString sDescription = dbInnerrecord.asString(pfnDescription);
+			QString sStrategyName = dbInnerrecord.asString(pfnStrategyName);
+
+			pBQSheet->writeStr(nCurBQSheetRowPos, 0, sInternalQtyCode.toStdWString().c_str());
+			pBQSheet->writeStr(nCurBQSheetRowPos, 1, QString::number(nCalcRuleItemID).toStdWString().c_str());
+			pBQSheet->writeStr(nCurBQSheetRowPos, 2, sDescription.toStdWString().c_str());
+			pBQSheet->writeStr(nCurBQSheetRowPos, 3, sStrategyName.toStdWString().c_str());
+			nCurBQSheetRowPos++;
+		}
+
+		nCurBQSheetRowPos++;
+	}
+
+}
+
 void LibxlUtils::addGSPCalcRuleInternalQty(const QString& dbpath)
 {
 	GSPModel ipGSPModel = gspEngine().createModel();
@@ -518,17 +574,17 @@ void LibxlUtils::addGSPCalcRuleInternalQty(const QString& dbpath)
 	pBQSheet->setMerge(m_nCurBQSheetRowPos, m_nCurBQSheetRowPos, 0, 1);
 	m_nCurBQSheetRowPos++;
 
-	libxl::Sheet* pNormSheet = m_pBook->getSheet(c_nNormSheet);
-	pNormSheet->writeStr(m_nCurNormSheetRowPos, 0, tempExpr.toStdWString().c_str(), m_pRedFormat);
-	pNormSheet->setMerge(m_nCurNormSheetRowPos, m_nCurNormSheetRowPos, 0, 1);
-	m_nCurNormSheetRowPos++;
+// 	libxl::Sheet* pNormSheet = m_pBook->getSheet(c_nNormSheet);
+// 	pNormSheet->writeStr(m_nCurNormSheetRowPos, 0, tempExpr.toStdWString().c_str(), m_pRedFormat);
+// 	pNormSheet->setMerge(m_nCurNormSheetRowPos, m_nCurNormSheetRowPos, 0, 1);
+// 	m_nCurNormSheetRowPos++;
 
 	GSPDatabase pBusinessDb = ipGSPModel.find(pdnBusiness);
 	GSPDatabase pBQCalcRuleDb = ipGSPModel.find(pdnBQCalcRule);
 	GSPDatabase pNormCalcRuleDb = ipGSPModel.find(pdnNormCalcRule);
 
-	dealDanDanALLQMJQty_IsBQ(pBusinessDb, pBQCalcRuleDb, pNormCalcRuleDb, true);
-	dealDanDanALLQMJQty_IsBQ(pBusinessDb, pBQCalcRuleDb, pNormCalcRuleDb, false);
+	dealDanDanCalcRuleID_IsBQ(pBusinessDb, pBQCalcRuleDb, pNormCalcRuleDb, true);
+	//dealDanDanALLQMJQty_IsBQ(pBusinessDb, pBQCalcRuleDb, pNormCalcRuleDb, false);
 
 	m_nCurBQSheetRowPos++;
 	m_nCurNormSheetRowPos++;
