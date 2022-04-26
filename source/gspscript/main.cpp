@@ -1,6 +1,7 @@
 ﻿#include "GTJRunnable.h"
 #include "GCPPMatchQueryVarValue.h"
 #include "libxlUtils.h"
+#include <QDirIterator>
 
 void setExtProp(GSPFieldSchema oField, const QString& strExtPropCode, const QString& strExtPropValue)
 {
@@ -54,6 +55,44 @@ void innerAddField(GSPDatabase m_pDb)
 	}
 }
 
+void modifyGCLWallCalcSettingField(GSPDatabase m_pDb)
+{
+	GSPTable dbtable = m_pDb.findTable(ptnGCLWallCalcSettings);
+	GSPFieldSchemas oFieldSchemas = dbtable.tableSchema().fieldSchemas();
+
+	try
+	{
+		GSPFieldSchema oCaulkWidthField = oFieldSchemas.find(QStringLiteral("AreaCalcMethod"));
+		if (!oCaulkWidthField)
+		{
+			return;
+		}
+		setExtProp(oCaulkWidthField, "VisibleFlag", "True");
+
+	}
+	catch (GSPException excpt)
+	{
+		QString errMessage = excpt.message();
+		qDebug() << QString("Exception happened, '%1'").arg(errMessage);
+		system("pause");
+		exit(0);
+	}
+}
+
+void modifyGCLWallCalcSettingRecord(GSPDatabase m_pDb)
+{
+	GSPTable dbtable = m_pDb.findTable(ptnGCLWallCalcSettings);
+
+	GSPView ipView = dbtable.createStaticView("");
+	int nAddrCnt = ipView.recordCount();
+	if (nAddrCnt < 1)
+	{
+		return;
+	}
+	GSPRecord dbrecord = ipView.records(0);
+	dbrecord.setAsInteger("AreaCalcMethod", 0);
+}
+
 // 清单、定额计算设置表添加字段
 void addCalcSettingField(const QString& dbpath)
 {
@@ -73,6 +112,45 @@ void addCalcSettingField(const QString& dbpath)
 	innerAddField(m_pDb);
 
 	ipGSPModel.setMode(gmRuntime); // gmRuntime 加字段，需要在保存之前重新设置为运行期
+}
+
+// 清单、定额计算设置表添加字段
+void modifyCalcSettingField(const QString& dbpath)
+{
+	GSPModel ipGSPModel = gspEngine().createModel();
+	GSPModelPersistent(ipGSPModel).loadFromFile(dbpath);
+	ipGSPModel.setMode(gmDesign); // gmRuntime gmDesign 加字段，需要设置为设计期
+	SCOPE_EXIT
+	{
+		GSPModelPersistent(ipGSPModel).saveToFile(dbpath);
+	};
+
+	GSPDatabase m_pDb;
+	m_pDb = ipGSPModel.find(pdnBQCalcRule);
+	modifyGCLWallCalcSettingField(m_pDb);
+
+	m_pDb = ipGSPModel.find(pdnNormCalcRule);
+	modifyGCLWallCalcSettingField(m_pDb);
+
+	ipGSPModel.setMode(gmRuntime); // gmRuntime 加字段，需要在保存之前重新设置为运行期
+}
+
+void modifyCalcSettingRecord(const QString& dbpath)
+{
+	GSPModel ipGSPModel = gspEngine().createModel();
+	GSPModelPersistent(ipGSPModel).loadFromFile(dbpath);
+	ipGSPModel.setMode(gmRuntime);
+	SCOPE_EXIT
+	{
+		GSPModelPersistent(ipGSPModel).saveToFile(dbpath);
+	};
+
+	GSPDatabase m_pDb;
+	m_pDb = ipGSPModel.find(pdnBQCalcRule);
+	modifyGCLWallCalcSettingRecord(m_pDb);
+
+	m_pDb = ipGSPModel.find(pdnNormCalcRule);
+	modifyGCLWallCalcSettingRecord(m_pDb);
 }
 
 
@@ -650,7 +728,24 @@ int main(int argc, char *argv[])
 
 	//getInternalQtyCodeSet();
 
-	std::wstring strExcelFilePath = L"C:/Users/quanjl/Desktop/墙中间量.xlsx";
+	//!!!规则库目录
+	QDirIterator it(QStringLiteral("D:/180个库"), QStringList() << "RegionRule_Calc.GSP",
+		QDir::Files, QDirIterator::Subdirectories);
+	QStringList filelist;
+	while (it.hasNext()) {
+		filelist.append(it.next());
+	}
+	int maximum = filelist.count();
+	printf("规则库总共有[%d]个文件\n", maximum);
+	for (int i = 0; i < maximum; ++i) // maximum
+	{
+		QString path = filelist.at(i);
+		modifyCalcSettingField(path);
+		modifyCalcSettingRecord(path);
+		printf("\r现在正处理第[%d]个文件", i + 1);// \r回到本行的开头，刷新进度
+	}
+
+	std::wstring strExcelFilePath = L"C:/Users/quanjl/Desktop/墙中间量计算规则选项.xlsx";
 	LibxlUtils* pLibxl = new LibxlUtils;
 	pLibxl->exportToExcel(strExcelFilePath);
 	delete pLibxl;
