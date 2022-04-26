@@ -41,7 +41,10 @@ extern const QString pfnObjectElementTypeID;
 extern const QString pfnNullEnable;
 
 extern const QString pfnID;
+extern const QString pfnCalcDllName;
 extern const QString pfnStrategyName;
+extern const QString pfnIFCStrategyName;
+extern const QString pfnSortIndex;
 
 extern const QString pfnQtyType;
 

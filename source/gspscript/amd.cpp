@@ -29,7 +29,10 @@ const QString pfnObjectElementTypeID = "ObjectElementTypeID";
 const QString pfnNullEnable = "NullEnable";
 
 const QString pfnID = "ID";
+const QString pfnCalcDllName = "CalcDllName";
 const QString pfnStrategyName = "StrategyName";
+const QString pfnIFCStrategyName = "IFCStrategyName";
+const QString pfnSortIndex = "SortIndex";
 
 const QString pfnQtyType = "QtyType";
 
