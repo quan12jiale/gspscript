@@ -729,21 +729,21 @@ int main(int argc, char *argv[])
 	//getInternalQtyCodeSet();
 
 	//!!!规则库目录
-	QDirIterator it(QStringLiteral("D:/180个库"), QStringList() << "RegionRule_Calc.GSP",
-		QDir::Files, QDirIterator::Subdirectories);
-	QStringList filelist;
-	while (it.hasNext()) {
-		filelist.append(it.next());
-	}
-	int maximum = filelist.count();
-	printf("规则库总共有[%d]个文件\n", maximum);
-	for (int i = 0; i < maximum; ++i) // maximum
-	{
-		QString path = filelist.at(i);
-		modifyCalcSettingField(path);
-		modifyCalcSettingRecord(path);
-		printf("\r现在正处理第[%d]个文件", i + 1);// \r回到本行的开头，刷新进度
-	}
+// 	QDirIterator it(QStringLiteral("D:/180个库"), QStringList() << "RegionRule_Calc.GSP",
+// 		QDir::Files, QDirIterator::Subdirectories);
+// 	QStringList filelist;
+// 	while (it.hasNext()) {
+// 		filelist.append(it.next());
+// 	}
+// 	int maximum = filelist.count();
+// 	printf("规则库总共有[%d]个文件\n", maximum);
+// 	for (int i = 0; i < maximum; ++i) // maximum
+// 	{
+// 		QString path = filelist.at(i);
+// 		modifyCalcSettingField(path);
+// 		modifyCalcSettingRecord(path);
+// 		printf("\r现在正处理第[%d]个文件", i + 1);// \r回到本行的开头，刷新进度
+// 	}
 
 	std::wstring strExcelFilePath = L"C:/Users/quanjl/Desktop/墙中间量计算规则选项.xlsx";
 	LibxlUtils* pLibxl = new LibxlUtils;

@@ -92,7 +92,7 @@ void LibxlUtils::exportToExcel(const std::wstring& strExcelFilePath)
 // 	m_nCurNormSheetRowPos++;
 
 	//!!!规则库目录
-	QDirIterator it(QStringLiteral("E:/gtjcalcrule/2021新清单-修改-含21新清单"), QStringList() << "RegionRule_Calc.GSP",
+	QDirIterator it(QStringLiteral("E:/gtjcalcrule/2021新清单-修改-含21新清单/04-河北/11-房屋建筑与装饰工程计量规范计算规则(2021-河北)"), QStringList() << "RegionRule_Calc.GSP",
 		QDir::Files, QDirIterator::Subdirectories);
 	QStringList filelist;
 	while (it.hasNext()) {
@@ -138,7 +138,7 @@ bool LibxlUtils::dealInternalQtyMatchExpr(GSPDatabase m_pDb, int nInternalQtyID,
 
 QSet<QString> getInternalQtyCodeSet()
 {
-	static QSet<QString> oInternalQtyCodeSet;
+	thread_local QSet<QString> oInternalQtyCodeSet;
 	if (oInternalQtyCodeSet.isEmpty())
 	{
 		QList<QString> oInternalQtyCodeList;
@@ -159,7 +159,7 @@ QSet<QString> getInternalQtyCodeSet()
 
 QStringList getMJInternalQtyCodeSet()
 {
-	static QStringList oInternalQtyCodeSet;
+	thread_local QStringList oInternalQtyCodeSet;
 	if (oInternalQtyCodeSet.isEmpty())
 	{
 		oInternalQtyCodeSet << "YSMJ"
@@ -561,11 +561,95 @@ void LibxlUtils::dealDanDanCalcRuleID_IsBQ(GSPDatabase pBusinessDb, GSPDatabase 
 
 }
 
+void LibxlUtils::modifyCalcRuleItemID(GSPDatabase pBusinessDb, GSPDatabase pBQCalcRuleDb, GSPDatabase pNormCalcRuleDb)
+{
+	GSPTable pInternalQtyDictTable = pBusinessDb.findTable(ptnInternalQtyDict);
+	GSPTable pInternalQtyCalcRuleItemDictTable = pBusinessDb.findTable(ptnInternalQtyCalcRuleItemDict);
+
+	int nOkCalcRuleID = 5214;
+
+	QString expr = QString("ID=%1").arg(nOkCalcRuleID);
+	GSPView ipView = pInternalQtyCalcRuleItemDictTable.createStaticView(expr);
+	int nAddrCnt = ipView.recordCount();
+	if (nAddrCnt == 0)
+	{
+		expr = QStringLiteral("(InternalQtyID=13) and (Description='1  扣砼过梁面积')");
+		GSPView ipInnerView = pInternalQtyCalcRuleItemDictTable.createStaticView(expr);
+		int nInnerAddrCnt = ipInnerView.recordCount();
+		if (nInnerAddrCnt >= 1)
+		{
+			GSPRecord oldrecord = ipInnerView.records(0);
+
+			int nErrorCalcRuleID = oldrecord.asInteger(pfnID);
+			int nInternalQtyID = oldrecord.asInteger(pfnInternalQtyID);
+			QString sDescription = oldrecord.asString(pfnDescription);
+			QString sCalcDllName = oldrecord.asString(pfnCalcDllName);
+			QString sStrategyName = oldrecord.asString(pfnStrategyName);
+			QString sIFCStrategyName = oldrecord.asString(pfnIFCStrategyName);
+			bool bSortIndexNull = oldrecord.isNull(pfnSortIndex);
+			int nSortIndex = oldrecord.asInteger(pfnSortIndex);
+
+			GSPRecord newrecord = pInternalQtyCalcRuleItemDictTable.newRecord();//新建新记录
+			newrecord.setAsInteger(pfnID, nOkCalcRuleID);
+			newrecord.setAsInteger(pfnInternalQtyID, nInternalQtyID);
+			newrecord.setAsString(pfnDescription, sDescription);
+			newrecord.setAsString(pfnCalcDllName, sCalcDllName);
+			newrecord.setAsString(pfnStrategyName, sStrategyName);
+			newrecord.setAsString(pfnIFCStrategyName, sIFCStrategyName);
+			if (!bSortIndexNull)
+			{
+				newrecord.setAsInteger(pfnSortIndex, nSortIndex);
+			}
+			pInternalQtyCalcRuleItemDictTable.append(newrecord);//添加新记录
+
+			modifyInternalQtyCalcRule(pBQCalcRuleDb, pNormCalcRuleDb, true, nErrorCalcRuleID, nOkCalcRuleID);
+			modifyInternalQtyCalcRule(pBQCalcRuleDb, pNormCalcRuleDb, false, nErrorCalcRuleID, nOkCalcRuleID);
+
+			pInternalQtyCalcRuleItemDictTable.remove(oldrecord);//删除旧记录
+		}
+	}
+	else
+	{
+
+	}
+}
+
+void LibxlUtils::modifyInternalQtyCalcRule(GSPDatabase pBQCalcRuleDb, GSPDatabase pNormCalcRuleDb, 
+	bool isBQ, int nErrorCalcRuleID, int nOkCalcRuleID)
+{
+	GSPTable pInternalQtyCalcRuleTable = isBQ ? pBQCalcRuleDb.findTable(ptnInternalQtyCalcRule) : pNormCalcRuleDb.findTable(ptnInternalQtyCalcRule);
+
+// 	int nErrorCalcRuleID = 1025729;
+// 	int nOkCalcRuleID = 5214;
+
+	QString expr = QString("DefaultCalcRuleID=%1").arg(nErrorCalcRuleID);//修改默认计算规则选项ID
+	GSPView ipView1 = pInternalQtyCalcRuleTable.createStaticView(expr);
+	int nAddrCnt1 = ipView1.recordCount();
+	for (int i = 0; i < nAddrCnt1; i++)
+	{
+		GSPRecord dbrecord = ipView1.records(i);
+		dbrecord.setAsInteger(pfnDefaultCalcRuleID, nOkCalcRuleID);
+	}
+
+	expr = QString("CalcRuleID=%1").arg(nErrorCalcRuleID);//修改计算规则选项ID
+	GSPView ipView2 = pInternalQtyCalcRuleTable.createStaticView(expr);
+	int nAddrCnt2 = ipView2.recordCount();
+	for (int i = 0; i < nAddrCnt2; i++)
+	{
+		GSPRecord dbrecord = ipView2.records(i);
+		dbrecord.setAsInteger(pfnCalcRuleID, nOkCalcRuleID);
+	}
+}
+
 void LibxlUtils::addGSPCalcRuleInternalQty(const QString& dbpath)
 {
 	GSPModel ipGSPModel = gspEngine().createModel();
 	GSPModelPersistent(ipGSPModel).loadFromFile(dbpath);
 	ipGSPModel.setMode(gmRuntime);
+	SCOPE_EXIT
+	{
+		GSPModelPersistent(ipGSPModel).saveToFile(dbpath);
+	};
 
 	QString tempExpr = dbpath.section('/', 3);
 
@@ -583,8 +667,8 @@ void LibxlUtils::addGSPCalcRuleInternalQty(const QString& dbpath)
 	GSPDatabase pBQCalcRuleDb = ipGSPModel.find(pdnBQCalcRule);
 	GSPDatabase pNormCalcRuleDb = ipGSPModel.find(pdnNormCalcRule);
 
-	dealDanDanCalcRuleID_IsBQ(pBusinessDb, pBQCalcRuleDb, pNormCalcRuleDb, true);
-	//dealDanDanALLQMJQty_IsBQ(pBusinessDb, pBQCalcRuleDb, pNormCalcRuleDb, false);
+	//modifyCalcRuleItemID(pBusinessDb, pBQCalcRuleDb, pNormCalcRuleDb);
+	dealDanDanALLQMJQty_IsBQ(pBusinessDb, pBQCalcRuleDb, pNormCalcRuleDb, false);
 
 	m_nCurBQSheetRowPos++;
 	m_nCurNormSheetRowPos++;
