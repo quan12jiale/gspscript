@@ -60,6 +60,8 @@ extern const QString pfnCalcExpr;
 extern const QString pfnDefaultCalcRuleID;
 extern const QString pfnCalcRuleID;
 extern const QString pfnCheckBuildNo;
+extern const QString pfnCheckFlag;
+extern const QString pfnCheckRemark;
 
 extern const QString pfnSubjectMatchExpr;
 extern const QString pfnObjectMatchExpr;

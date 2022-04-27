@@ -48,6 +48,8 @@ const QString pfnCalcExpr = "CalcExpr";
 const QString pfnDefaultCalcRuleID = "DefaultCalcRuleID";
 const QString pfnCalcRuleID = "CalcRuleID";
 const QString pfnCheckBuildNo = "CheckBuildNo";
+const QString pfnCheckFlag = "CheckFlag";
+const QString pfnCheckRemark = "CheckRemark";
 
 const QString pfnSubjectMatchExpr = "SubjectMatchExpr";
 const QString pfnObjectMatchExpr = "ObjectMatchExpr";
