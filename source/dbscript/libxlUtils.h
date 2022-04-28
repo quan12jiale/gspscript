@@ -1,5 +1,6 @@
 #pragma once
 #include "libxl.h"
+#include "amd.h"
 #include <QString>
 
 class LibxlUtils
@@ -10,7 +11,10 @@ public:
 	void exportToExcel(const std::wstring& strExcelFilePath);
 
 private:
-	bool resetSheet(const QString& strGDBPath, const std::wstring& strTableName);
+	void modifyGDB(const QString& strGDBPath);
+
+	bool modifyMaterialDict(const QString& strGDBPath, ggp::CDatabase* m_pDb);
+	void modifyTypeDict(ggp::CDatabase* m_pDb);
 
 private:
 	libxl::Book* m_pBook;

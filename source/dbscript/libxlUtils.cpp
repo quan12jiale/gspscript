@@ -1,5 +1,4 @@
 #include "libxlUtils.h"
-#include "amd.h"
 #include <QDirIterator>
 
 static const wchar_t* c_sGDBSheet = L"数据库查询结果";
@@ -53,19 +52,34 @@ LibxlUtils::~LibxlUtils()
 void LibxlUtils::exportToExcel(const std::wstring& strExcelFilePath)
 {
 	libxl::Sheet* pReportSheet = m_pBook->addSheet(c_sGDBSheet);
-	std::wstring strTableName = L"MaterialDict";
 
-// 	QString strGDBPath = QStringLiteral("C:/Users/quanjl/Desktop/RegionRule_Model.GDB");
-// 	resetSheet(strGDBPath, strTableName);
+	// 调整列宽
+	pReportSheet->setCol(1, 1, 100);
 
-	QDirIterator it(QStringLiteral("F:/1.0.31.0基础+打胶嵌缝"), 
+	QDirIterator it(QStringLiteral("D:/2021新清单-修改-含21新清单"), 
 		QStringList() << "RegionRule_Model.GDB", QDir::Files, QDirIterator::Subdirectories);
+	QStringList filelist;
 	while (it.hasNext()) {
-		QString strGDBPath = it.next();
-		resetSheet(strGDBPath, strTableName);
+		filelist.append(it.next());
+	}
+	int maximum = filelist.count();
+	printf("GDB总共有[%d]个文件\n", maximum);
+	for (int i = 0; i < maximum; ++i)
+	{
+		QString strGDBPath = filelist.at(i);
+		modifyGDB(strGDBPath);
+		printf("\r现在正处理第[%d]个文件", i + 1);// \r回到本行的开头，刷新进度
 	}
 
 	m_pBook->save(strExcelFilePath.c_str());
+}
+
+void myAssert(bool cond)
+{
+	if (!cond)
+	{
+		exit(0);
+	}
 }
 
 // 遍历所有记录
@@ -79,22 +93,70 @@ int getMaxIdLoopAllRecord(ggp::CDBTable* dbtable, ggp::CDBField* dbfield)
 	for (int i = 0; i < nRecordCnt; i++)
 	{
 		ggp::FileAddress* rAddr = oAddrList.GetItem(i);
-		ggp::CDBRecord* dbrecord = dbtable->CreateRecordMap(*rAddr);
-		int nTempID = dbfield->GetInt64(dbrecord);
+		ggp::CDBRecordPtr dbrecord = dbtable->CreateRecordMap(*rAddr);
+		int nTempID = dbfield->GetInt64(dbrecord.get());
 		nID = std::max(nID, nTempID);
 	}
 
 	return nID;
 }
 
-bool LibxlUtils::resetSheet(const QString& strGDBPath, const std::wstring& strTableName)
+bool LibxlUtils::modifyMaterialDict(const QString& strGDBPath, ggp::CDatabase* m_pDb)
 {
 	libxl::Sheet* pReportSheet = m_pBook->getSheet(c_nGDBSheet);
-	pReportSheet->setCol(1, 1, 100);
-// 	pReportSheet->writeStr(m_nCurEmptyReportSheetRowPos, 1, strGDBPath.section('/', 5, 5).toStdWString().c_str());
-// 	pReportSheet->setMerge(m_nCurEmptyReportSheetRowPos, m_nCurEmptyReportSheetRowPos, 1, 8);
-// 	m_nCurEmptyReportSheetRowPos++;
 
+	ggp::CDBTable* dbtable = m_pDb->GetTable(ptnMaterialDict.toStdWString().c_str());
+	QMap<QString, ggp::CDBField*> dbfields = getFieldMap(dbtable);//字段名称和字段指针的map
+
+	std::wstring expr = L"(ElementTypeID == 36) && (SameString(Description,\"预制混凝土\"))";
+	ggp::CFileAddressList oAddrList;
+	if (!dbtable->Query(expr.c_str(), &oAddrList))
+	{
+		return false;
+	}
+
+	int nAddrCnt = oAddrList.GetCount();
+	if (nAddrCnt != 1)
+	{
+		myAssert(nAddrCnt == 0);
+		int nID = getMaxIdLoopAllRecord(dbtable, dbfields.value(pfnID));
+#if 1
+		ggp::FileAddress rAddr = dbtable->NewRecord();
+		ggp::CDBRecordPtr dbrecord = dbtable->CreateRecordMap(rAddr);
+
+		QJsonValue fvalue = nID + 1;
+		updatedbfield(dbrecord.get(), dbfields.value(pfnID), fvalue);
+
+		fvalue = 36;
+		updatedbfield(dbrecord.get(), dbfields.value(pfnElementTypeID), fvalue);
+
+		fvalue = QStringLiteral("预制混凝土");
+		updatedbfield(dbrecord.get(), dbfields.value(pfnDescription), fvalue);
+
+		fvalue = 10;
+		updatedbfield(dbrecord.get(), dbfields.value(pfnLevel), fvalue);
+
+		fvalue = 1;
+		updatedbfield(dbrecord.get(), dbfields.value(pfnHasIndenting), fvalue);
+
+		fvalue = 100;
+		updatedbfield(dbrecord.get(), dbfields.value(pfnType), fvalue);
+
+		fvalue = 1;
+		updatedbfield(dbrecord.get(), dbfields.value(pfnClassify), fvalue);
+		
+		dbtable->AddRecord(rAddr);
+#endif
+		QString subPath = strGDBPath.section('/', 2);
+		pReportSheet->writeStr(m_nCurEmptyReportSheetRowPos, 1, subPath.toStdWString().c_str(), m_pGreenFormat);
+		m_nCurEmptyReportSheetRowPos++;
+	}
+
+	return true;
+}
+
+void LibxlUtils::modifyGDB(const QString& strGDBPath)
+{
 	ggp::CDatabase* m_pDb = new ggp::CDatabase(256);
 	SCOPE_EXIT {
 		if (m_pDb->IsOpen())
@@ -107,103 +169,77 @@ bool LibxlUtils::resetSheet(const QString& strGDBPath, const std::wstring& strTa
 	bool exist = QFileInfo::exists(strGDBPath);
 	if (!exist)
 	{
-		return false;
+		return;
 	}
 
 	if (!m_pDb->Open(strGDBPath.toStdWString().c_str(), nullptr, ggp::FILEMODE_NORMAL))
 	{
 		qDebug() << QString("open database failed");
-		return false;
+		return;
 	}
 
-	ggp::CDBTable* dbtable = m_pDb->GetTable(strTableName.c_str());
-	
-	int nFieldCount = dbtable->FieldCount();// 字段个数
-	QMap<QString, ggp::CDBField*> dbfields;//字段名称和字段指针的map
-	QMap<QString, int> fieldsIndex;//字段名称和字段在excel中哪一列的map
-	for (int j = 0; j < nFieldCount; j++)
-	{
-		ggp::CDBField* pField = dbtable->GetField(j);
-		QString strFieldName = QString::fromWCharArray(pField->Name());
-		if (strFieldName.contains("InnerID"))
-		{
-			continue;
-		}
-		dbfields.insert(strFieldName, pField);
-		fieldsIndex.insert(strFieldName, j);
-// 		pReportSheet->writeStr(m_nCurEmptyReportSheetRowPos, j, strFieldName.toStdWString().c_str());
-// 
-// 		// 调整列宽
-// 		if (strFieldName == "Description")
-// 			pReportSheet->setCol(j, j, 35);
-	}
-	//m_nCurEmptyReportSheetRowPos++;
+	//modifyMaterialDict(strGDBPath, m_pDb);
+	modifyTypeDict(m_pDb);
+}
 
-	std::wstring expr = L"(ElementTypeID == 36) && (SameString(Description,\"预制混凝土\"))";
+void LibxlUtils::modifyTypeDict(ggp::CDatabase* m_pDb)
+{
+	ggp::CDBTable* dbtable = m_pDb->GetTable(ptnTypeDict.toStdWString().c_str());
+
+	QMap<QString, ggp::CDBField*> dbfields = getFieldMap(dbtable);//字段名称和字段指针的map
+	ggp::CDBField* pDescField = dbfields.value(pfnDescription);
+	ggp::CDBField* pLevelField = dbfields.value(pfnLevel);
+
+	std::wstring expr = L"ElementTypeID == 1003";
 	ggp::CFileAddressList oAddrList;
 	if (!dbtable->Query(expr.c_str(), &oAddrList))
 	{
-		return false;
+		return;
 	}
+
+	QString sQZGQ = QStringLiteral("轻质隔墙");
+	QString sQTQ = QStringLiteral("砌体墙");
+	QString sQKQ = QStringLiteral("砌块墙");
+	int nQZGQIndex = -1;
+	int nQTQIndex = -1;
+	int nQKQIndex = -1;
 
 	int nAddrCnt = oAddrList.GetCount();
-	if (nAddrCnt != 1)
+	for (int i = 0; i < nAddrCnt; i++)
 	{
-		int nID = getMaxIdLoopAllRecord(dbtable, dbfields["ID"]);
+		ggp::FileAddress* rAddr = oAddrList.GetItem(i);
+		ggp::CDBRecordPtr dbrecord = dbtable->CreateRecordMap(*rAddr);
 
-// 		ggp::FileAddress rAddr = dbtable->NewRecord();
-// 		ggp::CDBRecordPtr dbrecord = dbtable->CreateRecordMap(rAddr);
-// 
-// 		QJsonValue fvalue = nID + 1;
-// 		updatedbfield(dbrecord.get(), dbfields["ID"], fvalue);
-// 
-// 		fvalue = 36;
-// 		updatedbfield(dbrecord.get(), dbfields["ElementTypeID"], fvalue);
-// 
-// 		fvalue = QStringLiteral("预制混凝土");
-// 		updatedbfield(dbrecord.get(), dbfields["Description"], fvalue);
-// 
-// 		fvalue = 10;
-// 		updatedbfield(dbrecord.get(), dbfields["Level"], fvalue);
-// 
-// 		fvalue = 1;
-// 		updatedbfield(dbrecord.get(), dbfields["HasIndenting"], fvalue);
-// 
-// 		fvalue = 100;
-// 		updatedbfield(dbrecord.get(), dbfields["Type"], fvalue);
-// 
-// 		fvalue = 1;
-// 		updatedbfield(dbrecord.get(), dbfields["Classify"], fvalue);
-// 		
-// 		dbtable->AddRecord(rAddr);
-
-		pReportSheet->writeStr(m_nCurEmptyReportSheetRowPos, 1, strGDBPath.toStdWString().c_str());
-		m_nCurEmptyReportSheetRowPos++;
-		m_nCurEmptyReportSheetRowPos++;
+		const QString sBuffer = getFieldStringVal(dbrecord.get(), pDescField);
+		if (sBuffer == sQZGQ)
+		{
+			nQZGQIndex = i;
+		}
+		else if (sBuffer == sQTQ)
+		{
+			nQTQIndex = i;
+		}
+		else if (sBuffer == sQKQ)
+		{
+			nQKQIndex = i;
+		}
 	}
-// 	for (int k = 0; k < nAddrCnt; k++)
-// 	{
-// 		ggp::FileAddress* rAddr = oAddrList.GetItem(k);
-// 		ggp::CDBRecord* dbrecord = dbtable->CreateRecordMap(*rAddr);
-// 		for (auto iter = dbfields.begin(); iter != dbfields.end(); iter++)
-// 		{
-// 			QString strFieldName = iter.key();
-// 			ggp::CDBField* pField = iter.value();
-// 			if (strFieldName == "Description")
-// 			{
-// 				ggp::CString* pString = pField->CreateStringMap(dbrecord);
-// 				pReportSheet->writeStr(m_nCurEmptyReportSheetRowPos, fieldsIndex[strFieldName], QString::fromWCharArray(pString->Buffer()).toStdWString().c_str());
-// 			}
-// 			else
-// 			{
-// 				int nID = pField->GetInteger(dbrecord);
-// 				pReportSheet->writeStr(m_nCurEmptyReportSheetRowPos, fieldsIndex[strFieldName], QString::number(nID).toStdWString().c_str());
-// 			}
-// 		}
-// 		m_nCurEmptyReportSheetRowPos++;
-// 	}
-// 	m_nCurEmptyReportSheetRowPos++;
 
-	return true;
+	int nSrcIndex = (nQTQIndex != -1) ? nQTQIndex : nQKQIndex;
+	int nDstIndex = nQZGQIndex;
+	if (nSrcIndex != -1 && nDstIndex != -1)
+	{
+		ggp::FileAddress* rSrcAddr = oAddrList.GetItem(nSrcIndex);
+		ggp::CDBRecordPtr dbSrcrecord = dbtable->CreateRecordMap(*rSrcAddr);
+		int nSrcLevel = pLevelField->GetInteger(dbSrcrecord.get());
+
+		ggp::FileAddress* rDstAddr = oAddrList.GetItem(nDstIndex);
+		ggp::CDBRecordPtr dbDstrecord = dbtable->CreateRecordMap(*rDstAddr);
+		pLevelField->SetInteger(dbDstrecord.get(), nSrcLevel);
+	}
+	else
+	{
+		exit(0);
+	}
 }
 
