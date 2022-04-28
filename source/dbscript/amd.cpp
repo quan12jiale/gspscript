@@ -6,6 +6,44 @@ const QString pfnConditions = "conditions";
 const QString pfnCondition = "condition";
 const QString pfnFields = "fields";
 
+const QString ptnElementTypeDict = "ElementTypeDict";
+const QString ptnElementPropertyDict = "ElementPropertyDict";
+const QString ptnMaterialDict = "MaterialDict";
+const QString ptnTypeDict = "TypeDict";
+
+const QString pfnID = "ID";
+const QString pfnElementTypeID = "ElementTypeID";
+const QString pfnDescription = "Description";
+const QString pfnLevel = "Level";
+const QString pfnHasIndenting = "HasIndenting";
+const QString pfnType = "Type";
+const QString pfnClassify = "Classify";
+
+QMap<QString, ggp::CDBField*> getFieldMap(ggp::CDBTable* dbtable)
+{
+	// 字段个数
+	int nFieldCount = dbtable->FieldCount();
+	QMap<QString, ggp::CDBField*> dbfields;//字段名称和字段指针的map
+	for (int j = 0; j < nFieldCount; j++)
+	{
+		ggp::CDBField* pField = dbtable->GetField(j);
+		if (pField)
+		{
+			QString strFieldName = QString::fromWCharArray(pField->Name());
+			dbfields.insert(strFieldName, pField);
+		}
+	}
+	return dbfields;
+}
+
+QString getFieldStringVal(ggp::CDBRecord* dbrecord, ggp::CDBField* dbfield)
+{
+	ggp::CStringPtr ipCString = dbfield->CreateStringMap(dbrecord);
+	const wchar_t* pBuffer = ipCString->Buffer();
+	QString sBuffer = QString::fromWCharArray(pBuffer);
+	return sBuffer;
+}
+
 std::wstring mkexpr(ggp::CDBTable* table, const QJsonObject& jsobj)
 {
 	QString tableName = QString::fromWCharArray(table->Name());
@@ -205,18 +243,7 @@ bool dbadd(ggp::CDatabase* db, const QJsonArray& jsarray)
 			continue;
 		}
 
-		// 字段个数
-		int nFieldCount = dbtable->FieldCount();
-		QMap<QString, ggp::CDBField*> dbfields;//字段名称和字段指针的map
-		for (int j = 0; j < nFieldCount; j++)
-		{
-			ggp::CDBField* pField = dbtable->GetField(j);
-			if (pField)
-			{
-				QString strFieldName = QString::fromWCharArray(pField->Name());
-				dbfields.insert(strFieldName, pField);
-			}
-		}
+		QMap<QString, ggp::CDBField*> dbfields = getFieldMap(dbtable);//字段名称和字段指针的map
 
 		int ncount = 0;
 		QJsonArray records = jsobj[pfnRecords].toArray();
@@ -288,18 +315,7 @@ bool dbmodify(ggp::CDatabase* db, const QJsonArray& jsarray)
 			continue;
 		}
 
-		// 字段个数
-		int nFieldCount = dbtable->FieldCount();
-		QMap<QString, ggp::CDBField*> dbfields;//字段名称和字段指针的map
-		for (int j = 0; j < nFieldCount; j++)
-		{
-			ggp::CDBField* pField = dbtable->GetField(j);
-			if (pField)
-			{
-				QString strFieldName = QString::fromWCharArray(pField->Name());
-				dbfields.insert(strFieldName, pField);
-			}
-		}
+		QMap<QString, ggp::CDBField*> dbfields = getFieldMap(dbtable);//字段名称和字段指针的map
 
 		int ncount = 0;
 		QJsonArray records = jsobj[pfnRecords].toArray();
@@ -343,11 +359,11 @@ bool dbmodify(ggp::CDatabase* db, const QJsonArray& jsarray)
 				}
 
 				ncount += 1;
-				ggp::CDBRecord* dbrecord = dbtable->CreateRecordMap(*rAddr);
+				ggp::CDBRecordPtr dbrecord = dbtable->CreateRecordMap(*rAddr);
 				for (auto iter = objfields.begin(); iter != objfields.end(); iter++)
 				{
 					QString fname = iter.key();//字段名称
-					if (!updatedbfield(dbrecord, dbfields[fname], iter.value()))
+					if (!updatedbfield(dbrecord.get(), dbfields[fname], iter.value()))
 					{
 						qDebug() << QString("failed to update the record, '%1', '%2'")
 							.arg(tableName).arg(fname);

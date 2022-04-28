@@ -7,6 +7,23 @@
 #include <QJsonDocument>
 #include "GGDB\ggdbdbmgr.h"
 
+/************ RegionRule_Model表 *****************/
+extern const QString ptnElementTypeDict;
+extern const QString ptnElementPropertyDict;
+extern const QString ptnMaterialDict;
+extern const QString ptnTypeDict;
+
+extern const QString pfnID;
+extern const QString pfnElementTypeID;
+extern const QString pfnDescription;
+extern const QString pfnLevel;
+extern const QString pfnHasIndenting;
+extern const QString pfnType;
+extern const QString pfnClassify;
+
+QMap<QString, ggp::CDBField*> getFieldMap(ggp::CDBTable* dbtable);
+QString getFieldStringVal(ggp::CDBRecord* dbrecord, ggp::CDBField* dbfield);
+
 bool updatedbfield(ggp::CDBRecord* dbrecord,
 	ggp::CDBField* dbfield, const QJsonValue& fvalue);
 
