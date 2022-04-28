@@ -9,6 +9,39 @@ LibxlUtils::LibxlUtils()
 {
 	m_pBook = xlCreateXMLBook();
 	m_pBook->setKey(L"TommoT", L"windows-2421220b07c2e10a6eb96768a2p7r6gc");
+
+	// 序号、构件类型、报表量、编码、清单定额类别 绿色显示
+	libxl::Font* pGreenFont = m_pBook->addFont();
+	pGreenFont->setBold(true);
+
+	m_pGreenFormat = m_pBook->addFormat();
+	m_pGreenFormat->setFont(pGreenFont);
+	m_pGreenFormat->setBorderTop();
+	m_pGreenFormat->setBorderLeft();
+	m_pGreenFormat->setBorderBottom();
+	m_pGreenFormat->setBorderRight();
+	m_pGreenFormat->setAlignH(libxl::ALIGNH_CENTER);
+	m_pGreenFormat->setAlignV(libxl::ALIGNV_CENTER);
+	m_pGreenFormat->setFillPattern(libxl::FILLPATTERN_SOLID);
+	m_pGreenFormat->setPatternForegroundColor(libxl::COLOR_LIGHTGREEN);
+
+
+	// 红色字体
+	libxl::Font *pRedFont = m_pBook->addFont();
+	pRedFont->setColor(libxl::COLOR_RED);
+
+	m_pRedFormat = m_pBook->addFormat();
+	m_pRedFormat->setBorderTop();
+	m_pRedFormat->setBorderLeft();
+	m_pRedFormat->setBorderBottom();
+	m_pRedFormat->setBorderRight();
+	m_pRedFormat->setAlignH(libxl::ALIGNH_CENTER);
+	m_pRedFormat->setAlignV(libxl::ALIGNV_CENTER);
+	m_pRedFormat->setFillPattern(libxl::FILLPATTERN_SOLID);
+	m_pRedFormat->setPatternForegroundColor(libxl::COLOR_WHITE);
+	m_pRedFormat->setFont(pRedFont);
+	m_pRedFormat->setWrap(true);
+
 	m_nCurEmptyReportSheetRowPos = 0;
 }
 

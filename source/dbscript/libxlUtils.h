@@ -14,5 +14,8 @@ private:
 
 private:
 	libxl::Book* m_pBook;
+	libxl::Format* m_pGreenFormat;
+	libxl::Format* m_pRedFormat;
+
 	int m_nCurEmptyReportSheetRowPos;
 };
