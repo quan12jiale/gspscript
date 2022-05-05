@@ -745,7 +745,7 @@ int main(int argc, char *argv[])
 // 		printf("\r现在正处理第[%d]个文件", i + 1);// \r回到本行的开头，刷新进度
 // 	}
 
-	std::wstring strExcelFilePath = L"C:/Users/quanjl/Desktop/墙中间量计算规则选项.xlsx";
+	std::wstring strExcelFilePath = L"C:/Users/quanjl/Desktop/轻质隔墙规则库修改记录.xlsx";
 	LibxlUtils* pLibxl = new LibxlUtils;
 	pLibxl->exportToExcel(strExcelFilePath);
 	delete pLibxl;
