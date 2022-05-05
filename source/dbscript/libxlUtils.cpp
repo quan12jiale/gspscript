@@ -1,5 +1,4 @@
 #include "libxlUtils.h"
-#include <QDirIterator>
 
 static const wchar_t* c_sGDBSheet = L"数据库查询结果";
 static const int c_nGDBSheet = 0;
@@ -56,8 +55,8 @@ void LibxlUtils::exportToExcel(const std::wstring& strExcelFilePath)
 	// 调整列宽
 	pReportSheet->setCol(1, 1, 100);
 
-	QDirIterator it(QStringLiteral("D:/2021新清单-修改-含21新清单"), 
-		QStringList() << "RegionRule_Model.GDB", QDir::Files, QDirIterator::Subdirectories);
+	QDirIterator it(QStringLiteral("E:/2021新清单-修改-含21新清单"), // ParamPoly.GDB 
+		QStringList() << "RegionRule_Model.GDB", QDir::Files, QDirIterator::Subdirectories);// BarInfo.GDB
 	QStringList filelist;
 	while (it.hasNext()) {
 		filelist.append(it.next());
@@ -180,6 +179,30 @@ void LibxlUtils::modifyGDB(const QString& strGDBPath)
 
 	//modifyMaterialDict(strGDBPath, m_pDb);
 	modifyTypeDict(m_pDb);
+}
+
+void LibxlUtils::modifyBarPics(ggp::CDatabase* m_pDb)
+{
+	ggp::CDBTable* dbtable = m_pDb->GetTable(ptnBarPics.toStdWString().c_str());//ptnParamPoly ptnBarPics
+
+	QMap<QString, ggp::CDBField*> dbfields = getFieldMap(dbtable);//字段名称和字段指针的map
+	ggp::CDBField* pVectorDrawingField = dbfields.value(pfnVectorDrawing);
+
+	std::wstring expr = L"BarPicID == 1042";//ParamPolyID == 22701 BarPicID == 1042
+	ggp::CFileAddressList oAddrList;
+	dbtable->Query(expr.c_str(), &oAddrList);
+	for (int i = 0, nAddrCnt = oAddrList.GetCount(); i < nAddrCnt; i++)
+	{
+		ggp::FileAddress* rAddr = oAddrList.GetItem(i);
+		ggp::CDBRecordPtr dbrecord = dbtable->CreateRecordMap(*rAddr);
+		ggp::CStreamPtr ipStream = pVectorDrawingField->CreateStreamMap(dbrecord.get());
+		void* buff = ipStream->Buffer();
+		int length = ipStream->Length();
+
+		QFile oFile("F:/barPics.GVD");
+		oFile.open(QIODevice::WriteOnly);
+		oFile.write(reinterpret_cast<char*>(buff), length);
+	}
 }
 
 void LibxlUtils::modifyTypeDict(ggp::CDatabase* m_pDb)

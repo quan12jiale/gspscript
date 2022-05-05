@@ -2,7 +2,6 @@
 #include "amd.h"
 #include <QDir>
 #include <QFile>
-#include <QRegularExpression>
 #include <QCommandLineParser>
 #include <QCoreApplication>
 
@@ -89,7 +88,7 @@ int main(int argc, char *argv[])
 #if 0
 	QRegularExpression sep("\\s+");
 
-	QString batPath = "E:/IntegrationForGrowingQZGQ_0811/resource/json/QZGQ/3-addrecord.bat";
+	QString batPath = "E:/GTJ202110_Release/resource/json/PC/HJBar/3-addrecord.bat";
 	QFileInfo fileInfo(batPath);
 	QString batDir = fileInfo.absolutePath();
 	QFile file(batPath);
