@@ -11,6 +11,9 @@ const QString ptnElementPropertyDict = "ElementPropertyDict";
 const QString ptnMaterialDict = "MaterialDict";
 const QString ptnTypeDict = "TypeDict";
 
+const QString ptnBarPics = "BarPics";
+const QString ptnParamPoly = "ParamPoly";
+
 const QString pfnID = "ID";
 const QString pfnElementTypeID = "ElementTypeID";
 const QString pfnDescription = "Description";
@@ -18,6 +21,8 @@ const QString pfnLevel = "Level";
 const QString pfnHasIndenting = "HasIndenting";
 const QString pfnType = "Type";
 const QString pfnClassify = "Classify";
+
+const QString pfnVectorDrawing = "VectorDrawing";
 
 QMap<QString, ggp::CDBField*> getFieldMap(ggp::CDBTable* dbtable)
 {
@@ -40,7 +45,8 @@ QString getFieldStringVal(ggp::CDBRecord* dbrecord, ggp::CDBField* dbfield)
 {
 	ggp::CStringPtr ipCString = dbfield->CreateStringMap(dbrecord);
 	const wchar_t* pBuffer = ipCString->Buffer();
-	QString sBuffer = QString::fromWCharArray(pBuffer);
+	int length = ipCString->Length();
+	QString sBuffer = QString::fromWCharArray(pBuffer, length);
 	return sBuffer;
 }
 
@@ -128,6 +134,41 @@ std::wstring mkexpr(ggp::CDBTable* table, const QJsonObject& jsobj)
 	return expr.toStdWString();
 }
 
+//复制自tools仓库AddEntGDB/pyggdb.main.cpp文件805行
+bool SetHexBin(ggp::CDBField* dbfield,
+	ggp::CDBRecord* dbrecord, const QString& strVal)
+{
+	const ggp::FieldType ntype = dbfield->Type();
+	if (ntype != ggp::FIELDTYPE_STREAM) {
+		std::string message = "invalid field type: ";
+		message.append(std::to_string(ntype));
+		throw (std::runtime_error(message));
+	}
+
+	std::string sVal = strVal.toStdString();
+	const char* value = sVal.c_str();
+	const size_t length = sVal.size(); //strlen(value);
+
+	if (length & 0x01) {
+		std::string message = "invalid length";
+		throw (std::runtime_error(message));
+	}
+	if (length == 0) {
+		return dbfield->SetNull(dbrecord);
+	}
+	size_t ncount = length / 2;
+	std::unique_ptr<uint8_t[]> buff = std::make_unique<uint8_t[]>(ncount);
+	for (size_t idx = 0, jdx = 0; idx < length; idx += 2, ++jdx) {
+		uint8_t ch = static_cast<uint8_t>(toupper(value[idx]));
+		ch = ('A' <= ch && ch <= 'F' ? 10 + ch - 'A' : ch - '0');
+		buff[jdx] = (ch << 4);
+		ch = static_cast<uint8_t>(toupper(value[idx + 1]));
+		ch = ('A' <= ch && ch <= 'F' ? 10 + ch - 'A' : ch - '0');
+		buff[jdx] |= ch;
+	}
+	return dbfield->SetStream(dbrecord, buff.get(), static_cast<int>(ncount));
+}
+
 bool updatedbfield(ggp::CDBRecord* dbrecord,
 	ggp::CDBField* dbfield, const QJsonValue& fvalue)
 {
@@ -195,11 +236,33 @@ bool updatedbfield(ggp::CDBRecord* dbrecord,
 			std::wstring wstrVal = strVal.toStdWString();
 			return dbfield->SetString(dbrecord, wstrVal.c_str());
 		}
-		// CDBField目前没有SetHexBin接口,现在可能对应的是SetStream接口,不好构造.
-		// 只有ParamPoly.GDB的VectorDrawing字段会用到流字段类型，因此暂不实现
+		// 只有ParamPoly.GDB和BarInfo.GDB的VectorDrawing字段会用到流字段类型
 		case ggp::FIELDTYPE_STREAM:
 		{
-			return false;
+			thread_local QRegularExpression re1("[ \t\v\f\r\n]");
+			thread_local bool valid1 = re1.isValid();
+			QRegularExpressionMatch match1 = re1.match(strVal);
+			if (match1.hasMatch())
+			{
+				strVal.replace(re1, "");
+			}
+
+			if (strVal.size() % 2)
+			{
+				qDebug() << QString("length of field value invalid, '%1', '%2'").arg(fieldName).arg(strVal);
+				return false;
+			}
+
+			thread_local QRegularExpression re2("[^0-9a-fA-F]");
+			thread_local bool valid2 = re2.isValid();
+			QRegularExpressionMatch match2 = re2.match(strVal);
+			if (match2.hasMatch())
+			{
+				qDebug() << QString("field value invalid, '%1', '%2'").arg(fieldName).arg(strVal);
+				return false;
+			}
+			
+			return SetHexBin(dbfield, dbrecord, strVal.toUpper());
 		}
 		default:
 		{

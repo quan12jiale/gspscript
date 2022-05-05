@@ -2,16 +2,21 @@
 #include <QDebug>
 #include <QString>
 #include <QFileInfo>
+#include <QDirIterator>
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonDocument>
-#include "GGDB\ggdbdbmgr.h"
+#include <QRegularExpression>
+#include "GGDB/ggdbdbmgr.h"
 
 /************ RegionRule_Model表 *****************/
 extern const QString ptnElementTypeDict;
 extern const QString ptnElementPropertyDict;
 extern const QString ptnMaterialDict;
 extern const QString ptnTypeDict;
+
+extern const QString ptnBarPics;
+extern const QString ptnParamPoly;
 
 extern const QString pfnID;
 extern const QString pfnElementTypeID;
@@ -20,6 +25,8 @@ extern const QString pfnLevel;
 extern const QString pfnHasIndenting;
 extern const QString pfnType;
 extern const QString pfnClassify;
+
+extern const QString pfnVectorDrawing;
 
 QMap<QString, ggp::CDBField*> getFieldMap(ggp::CDBTable* dbtable);
 QString getFieldStringVal(ggp::CDBRecord* dbrecord, ggp::CDBField* dbfield);
