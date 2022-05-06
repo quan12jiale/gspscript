@@ -221,11 +221,9 @@ void LibxlUtils::modifyTypeDict(ggp::CDatabase* m_pDb)
 	}
 
 	QString sQZGQ = QStringLiteral("«·÷ ∏Ù«Ω");
-	QString sQTQ = QStringLiteral("∆ˆÃÂ«Ω");
-	QString sQKQ = QStringLiteral("∆ˆøÈ«Ω");
 	int nQZGQIndex = -1;
-	int nQTQIndex = -1;
-	int nQKQIndex = -1;
+
+	int nMinLevel = 11;
 
 	int nAddrCnt = oAddrList.GetCount();
 	for (int i = 0; i < nAddrCnt; i++)
@@ -233,36 +231,22 @@ void LibxlUtils::modifyTypeDict(ggp::CDatabase* m_pDb)
 		ggp::FileAddress* rAddr = oAddrList.GetItem(i);
 		ggp::CDBRecordPtr dbrecord = dbtable->CreateRecordMap(*rAddr);
 
+		int nLevel = pLevelField->GetInteger(dbrecord.get());
+		nMinLevel = std::min(nMinLevel, nLevel);
+
 		const QString sBuffer = getFieldStringVal(dbrecord.get(), pDescField);
 		if (sBuffer == sQZGQ)
 		{
 			nQZGQIndex = i;
 		}
-		else if (sBuffer == sQTQ)
-		{
-			nQTQIndex = i;
-		}
-		else if (sBuffer == sQKQ)
-		{
-			nQKQIndex = i;
-		}
 	}
 
-	int nSrcIndex = (nQTQIndex != -1) ? nQTQIndex : nQKQIndex;
-	int nDstIndex = nQZGQIndex;
-	if (nSrcIndex != -1 && nDstIndex != -1)
+	myAssert(nMinLevel == 1 || nMinLevel == 0);
+	myAssert(nQZGQIndex != -1);
 	{
-		ggp::FileAddress* rSrcAddr = oAddrList.GetItem(nSrcIndex);
-		ggp::CDBRecordPtr dbSrcrecord = dbtable->CreateRecordMap(*rSrcAddr);
-		int nSrcLevel = pLevelField->GetInteger(dbSrcrecord.get());
-
-		ggp::FileAddress* rDstAddr = oAddrList.GetItem(nDstIndex);
+		ggp::FileAddress* rDstAddr = oAddrList.GetItem(nQZGQIndex);
 		ggp::CDBRecordPtr dbDstrecord = dbtable->CreateRecordMap(*rDstAddr);
-		pLevelField->SetInteger(dbDstrecord.get(), nSrcLevel);
-	}
-	else
-	{
-		exit(0);
+		pLevelField->SetInteger(dbDstrecord.get(), nMinLevel);
 	}
 }
 
