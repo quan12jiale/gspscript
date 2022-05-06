@@ -166,6 +166,15 @@ bool SetHexBin(ggp::CDBField* dbfield,
 		ch = ('A' <= ch && ch <= 'F' ? 10 + ch - 'A' : ch - '0');
 		buff[jdx] |= ch;
 	}
+#if 1
+	QByteArray baFromHex = QByteArray::fromHex(strVal.toUtf8());
+	QByteArray baFromBuff(reinterpret_cast<char*>(buff.get()), static_cast<int>(ncount));
+	bool equal = baFromHex == baFromBuff;
+	if (equal)
+	{
+		return dbfield->SetStream(dbrecord, baFromHex.constData(), baFromHex.size());
+	}
+#endif
 	return dbfield->SetStream(dbrecord, buff.get(), static_cast<int>(ncount));
 }
 
