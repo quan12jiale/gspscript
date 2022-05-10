@@ -12,8 +12,6 @@ public:
 
 private:
 	bool dealInternalQtyMatchExpr(GSPDatabase m_pDb, int nInternalQtyID, bool bAsSubject);
-	void getInternalQtyID(GSPDatabase pBusinessDb, GSPDatabase pBQCalcRuleDb, GSPDatabase pNormCalcRuleDb,
-		const QString& dbpath, bool bAsSubject);
 	void addGSPCalcRuleInternalQty(const QString& dbpath);
 	void dealQMJ_IsBQ(const QString& dbpath, GSPDatabase pBusinessDb, GSPDatabase pBQCalcRuleDb, GSPDatabase pNormCalcRuleDb, bool isBQ, bool isMJ);
 
