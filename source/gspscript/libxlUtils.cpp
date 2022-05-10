@@ -69,6 +69,7 @@ void LibxlUtils::exportToExcel(const std::wstring& strExcelFilePath)
 	pBQSheet->setCol(8, 8, 40);
 	pBQSheet->setCol(9, 9, 40);
 	pBQSheet->setCol(10, 10, 40);
+	pBQSheet->setCol(11, 11, 40);
 
 	pNormSheet->setCol(0, 0, 10);
 	pNormSheet->setCol(1, 1, 10);
@@ -81,6 +82,7 @@ void LibxlUtils::exportToExcel(const std::wstring& strExcelFilePath)
 	pNormSheet->setCol(8, 8, 40);
 	pNormSheet->setCol(9, 9, 40);
 	pNormSheet->setCol(10, 10, 40);
+	pNormSheet->setCol(11, 11, 40);
 
 // 	QString sDescription = QStringLiteral("描述代码");
 // 	QString sSubjectMatchExpr = QStringLiteral("主体匹配表达式");
@@ -106,7 +108,7 @@ void LibxlUtils::exportToExcel(const std::wstring& strExcelFilePath)
 // 	m_nCurNormSheetRowPos++;
 
 	//!!!规则库目录
-	QDirIterator it(QStringLiteral("D:/2021新清单-修改-含21新清单"), QStringList() << "RegionRule_Calc.GSP",
+	QDirIterator it(QStringLiteral("E:/2021新清单-修改-含21新清单"), QStringList() << "RegionRule_Calc.GSP",
 		QDir::Files, QDirIterator::Subdirectories);
 	QStringList filelist;
 	while (it.hasNext()) {
@@ -719,22 +721,22 @@ void LibxlUtils::modifyKQMJ_KQTJ(GSPDatabase pBusinessDb, GSPDatabase pBQCalcRul
 	libxl::Sheet* pBQSheet = m_pBook->getSheet(isBQ ? c_nBQSheet : c_nNormSheet);
 
 	QString tempExpr = QStringLiteral("旧的描述");
-	pBQSheet->writeStr(nCurBQSheetRowPos, 2, tempExpr.toStdWString().c_str(), m_pGreenFormat);
-	tempExpr = QStringLiteral("旧的主体匹配表达式");
 	pBQSheet->writeStr(nCurBQSheetRowPos, 3, tempExpr.toStdWString().c_str(), m_pGreenFormat);
-	tempExpr = QStringLiteral("旧的客体匹配表达式");
+	tempExpr = QStringLiteral("旧的主体匹配表达式");
 	pBQSheet->writeStr(nCurBQSheetRowPos, 4, tempExpr.toStdWString().c_str(), m_pGreenFormat);
-	tempExpr = QStringLiteral("旧的中间量计算规则选项描述");
+	tempExpr = QStringLiteral("旧的客体匹配表达式");
 	pBQSheet->writeStr(nCurBQSheetRowPos, 5, tempExpr.toStdWString().c_str(), m_pGreenFormat);
+	tempExpr = QStringLiteral("旧的中间量计算规则选项描述");
+	pBQSheet->writeStr(nCurBQSheetRowPos, 6, tempExpr.toStdWString().c_str(), m_pGreenFormat);
 
 	tempExpr = QStringLiteral("新的描述");
-	pBQSheet->writeStr(nCurBQSheetRowPos, 7, tempExpr.toStdWString().c_str(), m_pGreenFormat);
-	tempExpr = QStringLiteral("新的主体匹配表达式");
 	pBQSheet->writeStr(nCurBQSheetRowPos, 8, tempExpr.toStdWString().c_str(), m_pGreenFormat);
-	tempExpr = QStringLiteral("新的客体匹配表达式");
+	tempExpr = QStringLiteral("新的主体匹配表达式");
 	pBQSheet->writeStr(nCurBQSheetRowPos, 9, tempExpr.toStdWString().c_str(), m_pGreenFormat);
-	tempExpr = QStringLiteral("新的中间量计算规则选项描述");
+	tempExpr = QStringLiteral("新的客体匹配表达式");
 	pBQSheet->writeStr(nCurBQSheetRowPos, 10, tempExpr.toStdWString().c_str(), m_pGreenFormat);
+	tempExpr = QStringLiteral("新的中间量计算规则选项描述");
+	pBQSheet->writeStr(nCurBQSheetRowPos, 11, tempExpr.toStdWString().c_str(), m_pGreenFormat);
 
 	nCurBQSheetRowPos++;
 
@@ -779,10 +781,10 @@ void LibxlUtils::modifyKQMJ_KQTJ(GSPDatabase pBusinessDb, GSPDatabase pBQCalcRul
 			sCalcRuleDesc = sCalcRuleOptionDesc;
 		}
 
-		pBQSheet->writeStr(nCurBQSheetRowPos, 2, sDescription.toStdWString().c_str(), m_pGreenFormat);
-		pBQSheet->writeStr(nCurBQSheetRowPos, 3, sSubjectMatchExpr.toStdWString().c_str(), m_pGreenFormat);
-		pBQSheet->writeStr(nCurBQSheetRowPos, 4, sObjectMatchExpr.toStdWString().c_str(), m_pGreenFormat);
-		pBQSheet->writeStr(nCurBQSheetRowPos, 5, sCalcRuleDesc.toStdWString().c_str(), m_pGreenFormat);
+		pBQSheet->writeStr(nCurBQSheetRowPos, 3, sDescription.toStdWString().c_str(), m_pGreenFormat);
+		pBQSheet->writeStr(nCurBQSheetRowPos, 4, sSubjectMatchExpr.toStdWString().c_str(), m_pGreenFormat);
+		pBQSheet->writeStr(nCurBQSheetRowPos, 5, sObjectMatchExpr.toStdWString().c_str(), m_pGreenFormat);
+		pBQSheet->writeStr(nCurBQSheetRowPos, 6, sCalcRuleDesc.toStdWString().c_str(), m_pGreenFormat);
 
 		nCurBQSheetRowPos++;
 
@@ -796,11 +798,10 @@ void LibxlUtils::modifyKQMJ_KQTJ(GSPDatabase pBusinessDb, GSPDatabase pBQCalcRul
 		nInternalQtyCalcRuleAddrCnt = ipInternalQtyCalcRuleView.recordCount();
 
 		QString sMJHeader = isMJ ? QStringLiteral("面积") : QStringLiteral("体积");
-		pBQSheet->writeStr(nCurBQSheetRowPos - 2, 0, dbpath.section('/', 2, 2).toStdWString().c_str(), m_pGreenFormat);
-		pBQSheet->writeStr(nCurBQSheetRowPos - 2, 1, sMJHeader.toStdWString().c_str(), m_pGreenFormat);
 
 		pBQSheet->writeStr(nCurBQSheetRowPos - 1, 0, dbpath.section('/', 2, 2).toStdWString().c_str(), m_pGreenFormat);
 		pBQSheet->writeStr(nCurBQSheetRowPos - 1, 1, sMJHeader.toStdWString().c_str(), m_pGreenFormat);
+		pBQSheet->writeStr(nCurBQSheetRowPos - 1, 2, dbpath.section('/', 3).toStdWString().c_str(), m_pGreenFormat);
 		for (int i = 0; i < nInternalQtyCalcRuleAddrCnt; i++)
 		{
 			GSPRecord dbInternalQtyCalcRuleRecord = ipInternalQtyCalcRuleView.records(i);
@@ -819,11 +820,12 @@ void LibxlUtils::modifyKQMJ_KQTJ(GSPDatabase pBusinessDb, GSPDatabase pBQCalcRul
 
 			pBQSheet->writeStr(nCurBQSheetRowPos, 0, dbpath.section('/', 2, 2).toStdWString().c_str(), m_pGreenFormat);
 			pBQSheet->writeStr(nCurBQSheetRowPos, 1, sMJHeader.toStdWString().c_str(), m_pGreenFormat);
+			pBQSheet->writeStr(nCurBQSheetRowPos, 2, dbpath.section('/', 3).toStdWString().c_str(), m_pGreenFormat);
 
-			pBQSheet->writeStr(nCurBQSheetRowPos, 7, sDescription.toStdWString().c_str(), m_pGreenFormat);
-			pBQSheet->writeStr(nCurBQSheetRowPos, 8, sSubjectMatchExpr.toStdWString().c_str(), m_pGreenFormat);
-			pBQSheet->writeStr(nCurBQSheetRowPos, 9, sObjectMatchExpr.toStdWString().c_str(), m_pGreenFormat);
-			pBQSheet->writeStr(nCurBQSheetRowPos, 10, sCalcRuleDesc.toStdWString().c_str(), m_pGreenFormat);
+			pBQSheet->writeStr(nCurBQSheetRowPos, 8, sDescription.toStdWString().c_str(), m_pGreenFormat);
+			pBQSheet->writeStr(nCurBQSheetRowPos, 9, sSubjectMatchExpr.toStdWString().c_str(), m_pGreenFormat);
+			pBQSheet->writeStr(nCurBQSheetRowPos, 10, sObjectMatchExpr.toStdWString().c_str(), m_pGreenFormat);
+			pBQSheet->writeStr(nCurBQSheetRowPos, 11, sCalcRuleDesc.toStdWString().c_str(), m_pGreenFormat);
 
 			nCurBQSheetRowPos++;
 		}
@@ -1182,16 +1184,16 @@ void LibxlUtils::addGSPCalcRuleInternalQty(const QString& dbpath)
 		GSPModelPersistent(ipGSPModel).saveToFile(dbpath);
 	};
 
-	QString tempExpr = dbpath.section('/', 3);
-
-	libxl::Sheet* pBQSheet = m_pBook->getSheet(c_nBQSheet);
-	pBQSheet->writeStr(m_nCurBQSheetRowPos, 2, tempExpr.toStdWString().c_str(), m_pRedFormat);
-	pBQSheet->setMerge(m_nCurBQSheetRowPos, m_nCurBQSheetRowPos, 2, 10);
+// 	QString tempExpr = dbpath.section('/', 3);
+// 
+// 	libxl::Sheet* pBQSheet = m_pBook->getSheet(c_nBQSheet);
+// 	pBQSheet->writeStr(m_nCurBQSheetRowPos, 2, tempExpr.toStdWString().c_str(), m_pRedFormat);
+// 	pBQSheet->setMerge(m_nCurBQSheetRowPos, m_nCurBQSheetRowPos, 2, 10);
 	m_nCurBQSheetRowPos++;
 
-	libxl::Sheet* pNormSheet = m_pBook->getSheet(c_nNormSheet);
-	pNormSheet->writeStr(m_nCurNormSheetRowPos, 2, tempExpr.toStdWString().c_str(), m_pRedFormat);
-	pNormSheet->setMerge(m_nCurNormSheetRowPos, m_nCurNormSheetRowPos, 2, 10);
+// 	libxl::Sheet* pNormSheet = m_pBook->getSheet(c_nNormSheet);
+// 	pNormSheet->writeStr(m_nCurNormSheetRowPos, 2, tempExpr.toStdWString().c_str(), m_pRedFormat);
+// 	pNormSheet->setMerge(m_nCurNormSheetRowPos, m_nCurNormSheetRowPos, 2, 10);
 	m_nCurNormSheetRowPos++;
 
 	GSPDatabase pBusinessDb = ipGSPModel.find(pdnBusiness);
