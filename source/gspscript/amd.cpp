@@ -34,8 +34,12 @@ const QString pfnStrategyName = "StrategyName";
 const QString pfnIFCStrategyName = "IFCStrategyName";
 const QString pfnSortIndex = "SortIndex";
 
+const QString pfnShowQtySettingID = "ShowQtySettingID";
+const QString pfnShowQtyType = "ShowQtyType";
 const QString pfnQtyType = "QtyType";
-
+const QString pfnUsedFlag = "UsedFlag";
+const QString pfnUsedFlagEx = "UsedFlagEx";
+const QString pfnOrderID = "OrderID";
 
 /************ CalcRule表 *****************/
 const QString ptnQtyCalcRule = "QtyCalcRule";

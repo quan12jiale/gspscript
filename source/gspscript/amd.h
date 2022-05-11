@@ -46,8 +46,12 @@ extern const QString pfnStrategyName;
 extern const QString pfnIFCStrategyName;
 extern const QString pfnSortIndex;
 
+extern const QString pfnShowQtySettingID;
+extern const QString pfnShowQtyType;
 extern const QString pfnQtyType;
-
+extern const QString pfnUsedFlag;
+extern const QString pfnUsedFlagEx;
+extern const QString pfnOrderID;
 
 /************ CalcRule表 *****************/
 extern const QString ptnQtyCalcRule;
