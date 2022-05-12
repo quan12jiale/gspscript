@@ -58,14 +58,14 @@ target_include_directories(
 )
 
 ##配置库依赖
-find_package(Qt5 COMPONENTS Core REQUIRED)
+find_package(Qt5 COMPONENTS Core Network Sql REQUIRED)
 find_package(GLDRS COMPONENTS libxl REQUIRED)
 find_package(GBIM COMPONENTS Common REQUIRED)
 find_package(GDB COMPONENTS GGDB REQUIRED)
 
 target_link_libraries(${LIBRARY_TARGET_NAME}
 	PRIVATE GLDRS::libxl
-    PRIVATE Qt5::Core
+    PRIVATE Qt5::Core Qt5::Network Qt5::Sql
 	PRIVATE GBIM::Common
 	PRIVATE GDB::GGDB
 )

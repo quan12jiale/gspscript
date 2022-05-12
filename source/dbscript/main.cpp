@@ -1,5 +1,5 @@
 ﻿#include "libxlUtils.h"
-#include "amd.h"
+#include "CppDependBroadcast.h"
 #include <QDir>
 #include <QFile>
 #include <QCommandLineParser>
@@ -159,10 +159,15 @@ int main(int argc, char *argv[])
 		}
 	}
 #else
-	std::wstring strExcelFilePath = L"C:/Users/quanjl/Desktop/宁夏地区模型材质.xlsx";
-	LibxlUtils* pLibxl = new LibxlUtils;
-	pLibxl->exportToExcel(strExcelFilePath);
-	delete pLibxl;
+	QHash<QString, int> authors; 
+	const QString path = "D:/PCZ/build/build/BuildTools/CppDepend/";
+	transformAccount(authors, path);
+
+	QString html;
+	const QString db = "C:/Users/quanjl/Downloads/cpd.db";
+	GetDataFromHtml* pGetDataObj = new GetDataFromHtml(html, db);
+	pGetDataObj->getIgnoreDatasFromDB();
+	delete pGetDataObj;
 #endif
 	system("pause");
     return 0;
